@@ -86,7 +86,12 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: DataTypes.NOW 
       },
     });
-  
+    events.associate = (models) => {
+        events.belongsTo(models.city, {
+          foreignKey: 'city_id',
+          as: 'city' // Alias for the association
+        });
+      };
     return events;
   };
   
