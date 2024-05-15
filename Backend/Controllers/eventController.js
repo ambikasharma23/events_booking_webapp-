@@ -50,4 +50,35 @@ const getEventsbyId = async (req, res) => {
   });
   res.status(200).send(event);
 };
-module.exports = { getEvents, getEventsbyId };
+
+const createEvent = async (req, res) => {
+  try {
+    const newEvent = await Event.create(req.body);
+    res.status(201).json({ newEvent });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error during insertion" });
+  }
+};
+
+const deleteEvent = async (req, res) => {
+  try {
+    const eventId = req.params.id;
+    const event = await Event.findByPk(eventId);
+    console.log(event);
+    if (!event) {
+      return res.status(404).json({ error: "Event not found" });
+    }
+    await Event.destroy({
+      where: {
+        id: eventId,
+      },
+    });
+    res.status(200).json({ message: "Event deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting event:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+module.exports = { getEvents, getEventsbyId, deleteEvent, createEvent };
