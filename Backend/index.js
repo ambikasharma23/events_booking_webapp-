@@ -1,6 +1,9 @@
 const express = require("express");
 const app = express();
 const db = require("./models");
+const router = require("./Routes/eventRoute");
+
+app.use("/", router);
 const PORT = process.env.PORT || 3000;
 
 db.sequelize
