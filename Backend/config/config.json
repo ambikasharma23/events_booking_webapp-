@@ -1,23 +1,29 @@
 {
   "development": {
     "username": "root",
+<<<<<<< HEAD
+    "password": "navya@2018",
+    "database": "events",
+    "host": "localhost",
+=======
     "password": "1234",
     "database": "events",
     "host": "127.0.0.1",
+>>>>>>> c670af81e12baed1688e4d33b798c70cce9fce10
     "dialect": "mysql"
   },
   "test": {
     "username": "root",
-    "password": null,
-    "database": "database_test",
-    "host": "127.0.0.1",
+    "password": "navya@2018",
+    "database": "events",
+    "host": "localhost",
     "dialect": "mysql"
   },
   "production": {
     "username": "root",
-    "password": null,
-    "database": "database_production",
-    "host": "127.0.0.1",
+    "password": "navya@2018",
+    "database": "events",
+    "host": "localhost",
     "dialect": "mysql"
   }
 }
