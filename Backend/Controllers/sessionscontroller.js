@@ -43,8 +43,25 @@ const deleteSession = async (req, res) => {
     }
 };
 
+const getSessionsByEventId = async (req, res) => {
+    try {
+        const { eventId } = req.params;
+        const sessions = await Session.findAll({
+            where: { event_id: eventId }
+        });
+        if (sessions && sessions.length > 0) {
+            res.status(200).json(sessions);
+        } else {
+            throw new Error('Sessions not found for the event');
+        }
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};
+
 module.exports = {
     createSession,
     updateSession,
-    deleteSession
+    deleteSession,
+    getSessionsByEventId
 };

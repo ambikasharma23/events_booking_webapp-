@@ -9,4 +9,6 @@ router.put('/:id', sessionController.updateSession);
 
 router.delete('/:id', sessionController.deleteSession);
 
+router.get('/event/:eventId', sessionController.getSessionsByEventId);
+
 module.exports = router;
