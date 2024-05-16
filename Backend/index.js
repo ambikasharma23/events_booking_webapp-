@@ -1,19 +1,19 @@
 const express = require("express");
 const app = express();
 const db = require("./models");
-// const PORT = process.env.PORT || 3001;
-const router = require("./Routes/eventRoute");
 
-app.use("/", router);
 const PORT = process.env.PORT || 3000;
 
-db.sequelize
-  .sync()
-  .then(() => {
+app.use(express.json());
+app.use("/", require("./Routes/eventRoute"));
+app.use("/", require("./Routes/sessionsRoutes"));
+app.use("/", require("./Routes/ticketRoute"));
+
+
+db.sequelize.sync().then(() => {
     app.listen(PORT, () => {
-      console.log("Server is running",PORT);
+      console.log("Server is running on port", PORT);
     });
-  })
-  .catch((error) => {
-    console.error("Error syncing database:", error);
-  });
+  }).catch((error) => {
+    console.error("Error starting server:", error);
+});
