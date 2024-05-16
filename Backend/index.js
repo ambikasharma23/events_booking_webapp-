@@ -2,10 +2,11 @@ const express = require("express");
 const app = express();
 const db = require("./models");
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use("/", require("./Routes/eventRoute"));
+app.use("/", require("./Routes/sessionsRoutes"));
 app.use("/", require("./Routes/ticketRoute"));
 
 

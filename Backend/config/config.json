@@ -1,7 +1,7 @@
 {
   "development": {
     "username": "root",
-    "password": "1234",
+    "password": "navya@2018",
     "database": "events",
     "host": "localhost",
     "dialect": "mysql"
@@ -9,7 +9,7 @@
   },
   "test": {
     "username": "root",
-    "password": "1234",
+    "password": "navya@2018",
     "database": "database_testing",
     "host": "localhost",
     "dialect": "mysql"
