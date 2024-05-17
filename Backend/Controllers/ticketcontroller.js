@@ -10,6 +10,7 @@ const createTicket = async (req, res) => {
     res.status(500).json({ error: "Error during insertion" });
   }
 };
+
 const updateTicket = async (req, res) => {
   try {
     const { id } = req.params;
