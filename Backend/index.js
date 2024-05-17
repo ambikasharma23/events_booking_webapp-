@@ -8,7 +8,7 @@ app.use(express.json());
 app.use("/", require("./Routes/eventRoute"));
 app.use("/", require("./Routes/sessionsRoutes"));
 app.use("/", require("./Routes/ticketRoute"));
-
+app.use("/", require("./Routes/eventgalleryRoute"));
 
 db.sequelize.sync().then(() => {
     app.listen(PORT, () => {
