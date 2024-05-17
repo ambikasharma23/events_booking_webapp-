@@ -1,6 +1,20 @@
 const db = require("../models");
 const Ticket = db.ticket;
 
+const getTicket = async(req,res)=>{
+  try{
+  const sessionId = req.query.session_id;
+  let results;
+  if (sessionId) {
+    results = await Ticket.findOne({ where: { session_id: sessionId } });
+  }
+  res.status(200).send(results);
+}catch (error) {
+  console.error("Error handling request:", error);
+  res.status(500).json({ error: "Internal Server Error" });
+}
+}
+
 const createTicket = async (req, res) => {
   try {
     const ticket = await Ticket.create(req.body);
@@ -48,4 +62,5 @@ module.exports = {
   createTicket,
   updateTicket,
   deleteTicket,
+  getTicket
 };
