@@ -1,4 +1,5 @@
 const db = require("../models");
+const { Op } = require("sequelize");
 const Event = db.events;
 const City = db.city;
 
@@ -40,7 +41,31 @@ const getEvents = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+const EventsthisWeak = async (req, res) => {
+  try {
+    const today = new Date();
+    const day = today.getDay();
+    const diff = today.getDate() - day + (day === 0 ? -6 : 1);
 
+    const startOfWeek = new Date(today.setDate(diff));
+    startOfWeek.setHours(0, 0, 0, 0);
+    const endOfWeek = new Date(today.setDate(diff + 6));
+    endOfWeek.setHours(23, 59, 59, 999);
+
+    const weeklyEvents = await Event.findAll({
+      where: {
+        start_date: {
+          [Op.between]: [new Date(), endOfWeek],
+        },
+      },
+    });
+
+    res.status(200).json(weeklyEvents);
+  } catch (error) {
+    console.error("Error fetching events:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
 const getEventsbyId = async (req, res) => {
   let id = req.params.id;
   let event = await Event.findOne({
@@ -81,4 +106,10 @@ const deleteEvent = async (req, res) => {
   }
 };
 
-module.exports = { getEvents, getEventsbyId, deleteEvent, createEvent };
+module.exports = {
+  getEvents,
+  getEventsbyId,
+  deleteEvent,
+  createEvent,
+  EventsthisWeak,
+};
