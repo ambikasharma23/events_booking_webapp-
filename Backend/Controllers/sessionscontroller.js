@@ -59,6 +59,8 @@ const getSessionsByEventId = async (req, res) => {
   }
 };
 
+
+
 module.exports = {
   createSession,
   updateSession,

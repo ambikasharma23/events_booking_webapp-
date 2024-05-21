@@ -49,5 +49,11 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: DataTypes.NOW,
     },
   });
+  session.associate = (models) => {
+    session.belongsTo(models.events, {
+      foreignKey: 'event_id',
+      as: 'event'
+    });
+  };
   return session;
 };

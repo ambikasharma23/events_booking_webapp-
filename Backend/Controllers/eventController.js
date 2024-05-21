@@ -1,5 +1,6 @@
 const db = require("../models");
 const { Op } = require("sequelize");
+const sessions = require("../models/sessions");
 const Event = db.events;
 const City = db.city;
 
@@ -66,6 +67,28 @@ const EventsthisWeak = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+const getNightEvents = async(req,res)=>{
+  try{
+  const lateTime ='19:00:00'
+  const results = await Event.findAll({
+    include:{
+      model: sessions,
+      where:{
+        start_time: {
+        [Op.gt]:lateTime
+      }
+    }
+  }
+})
+res.status(200).send(results);
+}catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error while fetching sessions" });
+}
+}
+  
+
 const getEventsbyId = async (req, res) => {
   let id = req.params.id;
   let event = await Event.findOne({
@@ -112,4 +135,5 @@ module.exports = {
   deleteEvent,
   createEvent,
   EventsthisWeak,
+  getNightEvents
 };

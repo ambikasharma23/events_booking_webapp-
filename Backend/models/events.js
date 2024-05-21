@@ -86,5 +86,11 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: DataTypes.NOW,
     },
   });
+  Event.associate = (models) => {
+    Event.hasMany(models.sessions, {
+      foreignKey: 'session_id',
+      as: 'sessions'
+    });
+  };
   return events;
 };
