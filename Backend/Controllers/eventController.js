@@ -93,7 +93,6 @@ const getTodayEvent = async (req, res) => {
   try {
     const today = new Date();
     const formattedDate = moment(today).format("YYYY-MM-DD");
-    console.log(formattedDate);
     const results = await Event.findAll({
       where: {
         start_date: formattedDate,
@@ -125,6 +124,26 @@ const createEvent = async (req, res) => {
     res.status(500).json({ error: "Error during insertion" });
   }
 };
+const newEvent = async (req, res) => {
+  try {
+    const today = new Date();
+    const newEvent = today.setDate(today.getDate() - 2);
+    const formattedDate = moment(newEvent).format("YYYY-MM-DD");
+
+    console.log("newEvent: ", formattedDate);
+    const result = await Event.findAll({
+      where: {
+        createdAt: {
+          [Op.gt]: formattedDate,
+        },
+      },
+    });
+    res.status(200).send(result);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error while fetching sessions" });
+  }
+};
 
 const deleteEvent = async (req, res) => {
   try {
@@ -154,4 +173,5 @@ module.exports = {
   EventsthisWeak,
   getNightEvents,
   getTodayEvent,
+  newEvent,
 };

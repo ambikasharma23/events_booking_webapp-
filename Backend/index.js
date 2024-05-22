@@ -12,10 +12,13 @@ app.use("/", require("./Routes/eventgalleryRoute"));
 app.use("/", require("./Routes/eventexceptionRoute"));
 app.use("/", require("./Routes/bookingRoute"));
 
-db.sequelize.sync().then(() => {
+db.sequelize
+  .sync()
+  .then(() => {
     app.listen(PORT, () => {
       console.log("Server is running on port", PORT);
     });
-  }).catch((error) => {
+  })
+  .catch((error) => {
     console.error("Error starting server:", error);
-});
+  });
