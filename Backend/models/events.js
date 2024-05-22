@@ -52,11 +52,11 @@ module.exports = (sequelize, DataTypes) => {
       },
     },
     start_date: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: false,
     },
     end_date: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: false,
     },
     is_Recurrent: {
@@ -88,8 +88,8 @@ module.exports = (sequelize, DataTypes) => {
   });
   Event.associate = (models) => {
     Event.hasMany(models.sessions, {
-      foreignKey: 'session_id',
-      as: 'sessions'
+      foreignKey: "session_id",
+      as: "sessions",
     });
   };
   return events;

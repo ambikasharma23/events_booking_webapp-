@@ -1,6 +1,7 @@
 const db = require("../models");
 const { Op } = require("sequelize");
 const sessions = require("../models/sessions");
+const moment = require("moment");
 const Event = db.events;
 const City = db.city;
 
@@ -68,26 +69,42 @@ const EventsthisWeak = async (req, res) => {
   }
 };
 
-const getNightEvents = async(req,res)=>{
-  try{
-  const lateTime ='19:00:00'
-  const results = await Event.findAll({
-    include:{
-      model: sessions,
-      where:{
-        start_time: {
-        [Op.gt]:lateTime
-      }
-    }
-  }
-})
-res.status(200).send(results);
-}catch (err) {
+const getNightEvents = async (req, res) => {
+  try {
+    const lateTime = "19:00:00";
+    const results = await Event.findAll({
+      include: {
+        model: sessions,
+        where: {
+          start_time: {
+            [Op.gt]: lateTime,
+          },
+        },
+      },
+    });
+    res.status(200).send(results);
+  } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Error while fetching sessions" });
-}
-}
-  
+  }
+};
+
+const getTodayEvent = async (req, res) => {
+  try {
+    const today = new Date();
+    const formattedDate = moment(today).format("YYYY-MM-DD");
+    console.log(formattedDate);
+    const results = await Event.findAll({
+      where: {
+        start_date: formattedDate,
+      },
+    });
+    res.status(200).send(results);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error while fetching sessions" });
+  }
+};
 
 const getEventsbyId = async (req, res) => {
   let id = req.params.id;
@@ -135,5 +152,6 @@ module.exports = {
   deleteEvent,
   createEvent,
   EventsthisWeak,
-  getNightEvents
+  getNightEvents,
+  getTodayEvent,
 };
