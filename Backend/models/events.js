@@ -39,6 +39,12 @@ module.exports = (sequelize, DataTypes) => {
     },
     recurrent_type: {
       type: DataTypes.ENUM("daily", "weekly", "monthly", "yearly"),
+      allowNull:true,
+    },
+
+    custom_day:{
+        type:DataTypes.TEXT,
+        allowNull:false,
     },
     all_day: {
       type: DataTypes.BOOLEAN,
