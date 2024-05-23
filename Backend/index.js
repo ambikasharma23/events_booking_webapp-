@@ -11,6 +11,7 @@ app.use("/", require("./Routes/ticketRoute"));
 app.use("/", require("./Routes/eventgalleryRoute"));
 app.use("/", require("./Routes/eventexceptionRoute"));
 app.use("/", require("./Routes/bookingRoute"));
+app.use("/", require("./Routes/ticketinverntoryRoute"));
 
 db.sequelize.sync().then(() => {
     app.listen(PORT, () => {
