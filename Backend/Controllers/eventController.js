@@ -36,6 +36,8 @@ const getEvents = async (req, res) => {
     }
     if (category) {
       results = await Event.findOne({ where: { category_id: category } });
+    } else {
+      results = await Event.findAll();
     }
     res.status(200).send(results);
   } catch (error) {

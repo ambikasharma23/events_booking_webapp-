@@ -8,28 +8,54 @@ const updateEvent = async (req, res) => {
         is_recurrent: true,
       },
     });
-    const updateDate = events.map(async (events) => {
-      const newDate = new Date(events.start_date);
-      switch (events.recurrent_type) {
+    function getDays(year, month) {
+      return new Date(year, month + 1, 0).getDate();
+    }
+
+    const updateDate = events.map((event) => {
+      event.recurrent_count = (event.recurrent_count || 0) + 1;
+
+      const newDate = new Date(event.start_date);
+      let shouldUpdate = false;
+
+      switch (event.recurrent_type) {
         case "daily":
           newDate.setDate(newDate.getDate() + 1);
+          shouldUpdate = true;
+          event.recurrent_count = 0;
           break;
         case "weekly":
-          newDate.setDate(newDate.getDate() + 7);
+          if (event.recurrent_count > 7) {
+            newDate.setDate(newDate.getDate() + 7);
+            shouldUpdate = true;
+            event.recurrent_count = 0;
+          }
           break;
         case "monthly":
-          newDate.setMonth(newDate.getMonth() + 1);
+          const month = newDate.getMonth();
+          const year = newDate.getFullYear();
+          const days = getDays(year, month);
+          console.log("days: ", days);
+          if (event.recurrent_count > days) {
+            newDate.setMonth(newDate.getMonth() + 1);
+            shouldUpdate = true;
+            event.recurrent_count = 0;
+          }
           break;
         default:
-          console.error("Unknown recurrent_type:", events.recurrent_type);
+          console.error("Unknown recurrent_type:", event.recurrent_type);
           return;
       }
-      events.start_date = newDate;
-      return await events.save();
+
+      if (shouldUpdate) {
+        event.start_date = newDate;
+      }
+      return event.save(); 
     });
+
     await Promise.all(updateDate);
     console.log("Event dates updated");
-  } catch {
+  } catch (error) {
     console.error("Error updating event dates:", error);
   }
 };
