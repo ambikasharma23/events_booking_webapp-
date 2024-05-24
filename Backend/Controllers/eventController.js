@@ -12,15 +12,16 @@ const getEvents = async (req, res) => {
     const cityName = req.query.name;
     const region = req.query.region_id;
     const category = req.query.category_id;
+    const searchQuery=req.query.search;
 
     let results;
     if (eventId) {
       results = await Event.findOne({ where: { id: eventId } });
     }
-    if (EventName) {
+    else if (EventName) {
       results = await Event.findOne({ where: { event_name: EventName } });
     }
-    if (cityName) {
+    else if (cityName) {
       results = await Event.findAll({
         include: [
           {
@@ -31,11 +32,23 @@ const getEvents = async (req, res) => {
         ],
       });
     }
-    if (region) {
+    else if (region) {
       results = await Event.findOne({ where: { region_id: region } });
     }
-    if (category) {
+    else if (category) {
       results = await Event.findOne({ where: { category_id: category } });
+    }
+    else if(searchQuery){
+      results=await Event.findAll({
+        where: {
+          [Op.or]:[
+            {event_name:{[Op.like]:`%${searchQuery}%`}},
+            {event_description:{[Op.like]:`%${searchQuery}%`}},
+          ],
+        },
+      });
+    }else{
+      results=await Event.findAll();
     }
     res.status(200).send(results);
   } catch (error) {
