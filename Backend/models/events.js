@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
       refrences: {
-        model: "restaurants",
+        model: "restaurant",
         key: "id",
       },
     },
@@ -92,10 +92,16 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: DataTypes.NOW,
     },
   });
-  Event.associate = (models) => {
-    Event.hasMany(models.sessions, {
-      foreignKey: "session_id",
+  
+  events.associate = (models) => {
+    events.hasMany(models.session, {
+      foreignKey: "event_id",
       as: "sessions",
+    });
+
+    events.belongsTo(models.restaurant, {
+      foreignKey: "restaurant_id", // Check if the foreign key is correct
+      as: "restaurant", // Singularize the alias
     });
   };
   return events;
