@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true,
       allowNull: false,
     },
-    session: {
+    session_name: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -49,11 +49,17 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: DataTypes.NOW,
     },
   });
+
   session.associate = (models) => {
     session.belongsTo(models.events, {
       foreignKey: 'event_id',
       as: 'event'
     });
+    session.hasMany(models.ticket, {
+      foreignKey: 'session_id',
+      as: 'tickets'
+    });
   };
+
   return session;
 };
