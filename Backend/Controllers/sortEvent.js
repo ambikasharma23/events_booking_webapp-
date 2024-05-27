@@ -3,7 +3,20 @@ const Event = db.events;
 const Ticket = db.ticket;
 const Session = db.session;
 
-const Eventcost = async (req, res) => {
+const eventDate=async(req,res)=>{
+  try{
+  const results = await Event.findAll({
+    order: [["start_date", "ASC"]],
+  })
+  res.status(200).json(results);
+}
+catch (error) {
+  console.error(error);
+  res.status(500).json({ error: "Error while sorting events on the basis of date" });
+}
+};
+
+const eventCost = async (req, res) => {
   try {
     const sort = req.query.sort;
 
@@ -37,4 +50,4 @@ const Eventcost = async (req, res) => {
   }
 };
 
-module.exports = { Eventcost };
+module.exports = { eventCost, eventDate };
