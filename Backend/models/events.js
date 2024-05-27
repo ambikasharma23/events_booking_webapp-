@@ -95,9 +95,10 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: DataTypes.NOW,
     },
   });
-  Event.associate = (models) => {
-    Event.hasMany(models.sessions, {
-      foreignKey: "session_id",
+
+  events.associate = (models) => {
+    events.hasMany(models.session, {
+      foreignKey: "event_id",
       as: "sessions",
     });
 
