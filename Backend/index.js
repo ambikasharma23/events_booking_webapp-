@@ -15,6 +15,9 @@ app.use("/", require("./Routes/eventexceptionRoute"));
 app.use("/", require("./Routes/bookingRoute"));
 app.use("/", require("./Routes/ticketinverntoryRoute"));
 app.use("/", require("./Routes/sortRoute"));
+app.use("/", require("./Routes/restaurantRoute"));
+app.use("/", require("./Routes/categoryRoute"));
+
 cron.schedule("0 0 * * *", () => {
   console.log("Running the updateEventDates function");
   updateEvent();

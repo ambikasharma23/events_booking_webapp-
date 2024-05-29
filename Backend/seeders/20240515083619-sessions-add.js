@@ -8,7 +8,7 @@ module.exports = {
       [
         {
           session: "Morning",
-          event_id: 1,
+          event_id: 3,
           new_description: "Sample description for morning",
           start_time: "09:00:00",
           end_time: "12:00:00",
@@ -19,7 +19,7 @@ module.exports = {
         },
         {
           session: "Afternoon",
-          event_id: 1,
+          event_id: 4,
           new_description: "Sample description for afternoon",
           start_time: "12:00:00",
           end_time: "4:00:00",
@@ -30,7 +30,7 @@ module.exports = {
         },
         {
           session: "Evening",
-          event_id: 1,
+          event_id: 3,
           new_description: "Sample description for evening",
           start_time: "4:00:00",
           end_time: "8:00:00",
@@ -41,7 +41,7 @@ module.exports = {
         },
         {
           session: "Night",
-          event_id: 1,
+          event_id: 4,
           new_description: "Sample description for night",
           start_time: "8:00:00",
           end_time: "12:00:00",
