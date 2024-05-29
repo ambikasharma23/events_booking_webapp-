@@ -72,10 +72,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
-    isVisible: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: true,
-    },
     tags: {
       type: DataTypes.TEXT,
       allowNull: true,
@@ -107,7 +103,7 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     events.belongsTo(models.restaurant, {
-      foreignKey: "restaurant_id", 
+      foreignKey: "restaurant_id",
       as: "restaurant",
     });
   };
