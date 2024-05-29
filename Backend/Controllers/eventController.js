@@ -1,50 +1,84 @@
 const db = require("../models");
 const { Op } = require("sequelize");
-const sessions = require("../models/sessions");
-const moment = require("moment");
 const Event = db.events;
-const City = db.city;
+const EventException = db.event_exception;
+const City = db.cities;
+const moment = require("moment");
+
+const filterEvents = (events, eventExceptions) => {
+  const currentDate = new Date();
+  const formatDate = moment(currentDate).format("YYYY-MM-DD");
+  const currentDay = currentDate.getDay();
+  console.log(currentDay);
+
+  return events.filter((event) => {
+    const isException = eventExceptions.some((exception) => {
+      const startDate = exception.start_date
+        ? new Date(exception.start_date)
+        : null;
+      const endDate = exception.end_date ? new Date(exception.end_date) : null;
+      const formatStart = startDate
+        ? moment(startDate).format("YYYY-MM-DD")
+        : null;
+      const formatEnd = endDate ? moment(endDate).format("YYYY-MM-DD") : null;
+
+      return (
+        exception.event_id === event.id &&
+        ((!startDate &&
+          !endDate &&
+          exception.day &&
+          currentDay === exception.day) ||
+          !startDate ||
+          formatStart <= formatDate ||
+          !endDate ||
+          formatEnd >= formatDate ||
+          ((!exception.day || currentDay === exception.day) &&
+            (!exception.session_id ||
+              exception.session_id === event.session_id)))
+      );
+    });
+
+    return !isException && moment(event.end_date).isSameOrAfter(formatDate);
+  });
+};
 
 const getEvents = async (req, res) => {
   try {
-    const eventId = req.query.id;
-    const EventName = req.query.event_name;
-    const cityName = req.query.name;
-    const region = req.query.region_id;
-    const category = req.query.category_id;
-    const searchQuery = req.query.search;
+    const [events, eventExceptions] = await Promise.all([
+      Event.findAll(),
+      EventException.findAll(),
+    ]);
+    const visibleEvents = filterEvents(events, eventExceptions);
+    const {
+      id: eventId,
+      event_name: eventName,
+      name: cityName,
+      region_id: region,
+      category_id: category,
+      search: searchQuery,
+    } = req.query;
 
     let results;
     if (eventId) {
-      results = await Event.findOne({ where: { id: eventId } });
-    } else if (EventName) {
-      results = await Event.findOne({ where: { event_name: EventName } });
+      results = visibleEvents.find((event) => event.id == eventId);
+    } else if (eventName) {
+      results = visibleEvents.find((event) => event.event_name === eventName);
     } else if (cityName) {
-      results = await Event.findAll({
-        include: [
-          {
-            model: City,
-            as: "city",
-            where: { name: cityName },
-          },
-        ],
-      });
+      results = visibleEvents.filter((event) => event.city.name === cityName);
     } else if (region) {
-      results = await Event.findOne({ where: { region_id: region } });
+      results = visibleEvents.filter((event) => event.region_id == region);
     } else if (category) {
-      results = await Event.findOne({ where: { category_id: category } });
+      results = visibleEvents.filter((event) => event.category_id == category);
     } else if (searchQuery) {
-      results = await Event.findAll({
-        where: {
-          [Op.or]: [
-            { event_name: { [Op.like]: `%${searchQuery}%` } },
-            { event_description: { [Op.like]: `%${searchQuery}%` } },
-          ],
-        },
-      });
+      results = visibleEvents.filter(
+        (event) =>
+          event.event_name.includes(searchQuery) ||
+          event.event_description.includes(searchQuery)
+      );
     } else {
-      results = await Event.findAll();
+      results = visibleEvents;
     }
+
     res.status(200).send(results);
   } catch (error) {
     console.error("Error handling request:", error);
