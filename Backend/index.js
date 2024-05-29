@@ -19,6 +19,7 @@ app.use("/", require("./Routes/restaurantRoute"));
 app.use("/", require("./Routes/categoryRoute"));
 
 cron.schedule("0 0 * * *", () => {
+  // "* */3 * * *"
   console.log("Running the updateEventDates function");
   updateEvent();
 });
