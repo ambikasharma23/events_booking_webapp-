@@ -1,33 +1,69 @@
-const db= require("../models");
-const Booking = db.event_booking;
-const { updateTicketInventory } = require('../Controllers/ticketinventorycontroller');
+const { ticket, ticket_inventory, event_booking, Sequelize } = require('../models');
+const { Op } = Sequelize;
 
-const createBooking = async(req,res)=>{
-    try {
-        const{ticket_id, no_of_person}= req.body;
-        const booking = await Booking.create(req.body);
+const createBooking = async (req, res) => {
+  const { customer_id, name, contact, ticket_id, status, booking_date, no_of_persons } = req.body;
 
-        await updateTicketInventory(ticket_id, no_of_person);
-        res.status(201).json({ booking });
-      } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: "Error during insertion" });
-      }
+  try {
+    const inventory = await ticket_inventory.findOne({
+      where: { ticket_id }
+    });
+
+    if (!inventory) {
+      return res.status(404).json({ message: "Ticket inventory not found" });
+    }
+
+    if (inventory.quantity < no_of_persons) {
+      return res.status(400).json({ message: "Not enough tickets available" });
+    }
+
+  
+    const booking = await event_booking.create({
+      customer_id,
+      name,
+      contact,
+      ticket_id,
+      status,
+      booking_date,
+      no_of_persons
+    });
+
+   
+    inventory.quantity -= no_of_persons;
+    await inventory.save();
+
+    res.status(201).json({ message: "Booking created successfully", booking });
+  } catch (error) {
+    console.error("Error creating booking:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
 
-const getBooking = async(req,res)=>{
-    try{
-        const custId = req.query.customer_id;
-        let results;
-        if(custId){
-            results= await Booking.findOne({where:{
-                customer_id:custId
-            }})
+const getBookings = async (req, res) => {
+  try {
+    const bookings = await event_booking.findAll({
+      include: [
+        {
+          model: ticket,
+          as: 'ticket',
+          include: [
+            {
+              model: ticket_inventory,
+              as: 'ticket_inventory'
+            }
+          ]
         }
-        res.status(200).send(results);
-    }catch(err){
-        console.error(err);
-        res.status(500).json({error: "Error while fetching results"})
-    }
-}
-module.exports ={createBooking, getBooking};
+      ]
+    });
+
+    res.status(200).json(bookings);
+  } catch (error) {
+    console.error("Error fetching bookings:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+module.exports = {
+  createBooking,
+  getBookings
+};
