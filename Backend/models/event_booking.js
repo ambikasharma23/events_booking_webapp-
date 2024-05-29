@@ -1,6 +1,5 @@
-
 module.exports = (sequelize, DataTypes) => {
-  const event_booking = sequelize.define('event_booking', {
+  const event_booking = sequelize.define("event_booking", {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -9,10 +8,6 @@ module.exports = (sequelize, DataTypes) => {
     customer_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      refrences:{
-              model:'customers',
-              key:'id'
-      },
     },
     name: {
       type: DataTypes.STRING,
@@ -25,13 +20,13 @@ module.exports = (sequelize, DataTypes) => {
     ticket_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      refrences:{
-              model:'tickets',
-              key:'id'
+      refrences: {
+        model: "tickets",
+        key: "id",
       },
     },
     status: {
-      type: DataTypes.ENUM('completed', 'confirmed', 'cancel'),
+      type: DataTypes.ENUM("completed", "confirmed", "cancel"),
       allowNull: false,
     },
     booking_date: {
@@ -45,25 +40,22 @@ module.exports = (sequelize, DataTypes) => {
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
-      field: 'created_at',
-      defaultValue: DataTypes.NOW 
-
+      field: "created_at",
+      defaultValue: DataTypes.NOW,
     },
     updatedAt: {
       type: DataTypes.DATE,
       allowNull: false,
-      field: 'updated_at',
-      defaultValue: DataTypes.NOW 
-
+      field: "updated_at",
+      defaultValue: DataTypes.NOW,
     },
   });
-event_booking.associate=(models) => {
-  event_booking.belongsTo(models.ticket,{
-    foreignkey: "ticket_id",
-    as: "ticket"
-});
-};
- 
+  event_booking.associate = (models) => {
+    event_booking.belongsTo(models.ticket, {
+      foreignkey: "ticket_id",
+      as: "ticket",
+    });
+  };
 
   return event_booking;
 };
