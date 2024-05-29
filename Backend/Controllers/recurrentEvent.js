@@ -1,21 +1,26 @@
 const db = require("../models");
 const Event = db.events;
-const Session = db.sessions;
-const Ticket = db.tickets;
-const TicketInventory = db.ticket_inventories;
+const Session = db.session;
+const Ticket = db.ticket;
+const TicketInventory = db.ticket_inventory;
 
-const updateEvent = async (req, res) => {
+const updateEvent = async () => {
   try {
     const events = await Event.findAll({
       where: {
         is_recurrent: true,
       },
       include: [
-        { model: Session, as: "session" },
         {
-          model: Ticket,
-          as: "tickets",
-          include: [{ model: TicketInventory, as: "ticket_inventory" }],
+          model: Session,
+          as: "session",
+          include: [
+            {
+              model: Ticket,
+              as: "ticket",
+              include: [{ model: TicketInventory, as: "ticket_inventory" }],
+            },
+          ],
         },
       ],
     });
@@ -63,12 +68,14 @@ const updateEvent = async (req, res) => {
         event.start_date = newDate;
 
         // Update ticket inventory capacity
-        event.tickets.forEach(async (ticket) => {
-          if (ticket_inventory) {
-            ticket_inventory.quantity = ticket.capacity;
-            await ticket.inventory.save();
+        for (const session of event.session) {
+          for (const ticket of session.ticket) {
+            if (ticket.ticket_inventory) {
+              ticket.ticket_inventory.quantity = ticket.capacity;
+              await ticket.ticket_inventory.save();
+            }
           }
-        });
+        }
 
         await event.save();
       }
@@ -76,8 +83,10 @@ const updateEvent = async (req, res) => {
 
     await Promise.all(updatePromises);
     console.log("Event dates and ticket inventory updated");
+    // res.status(200).send("Event dates and ticket inventory updated");
   } catch (error) {
     console.error("Error updating event dates and ticket inventory:", error);
+    // res.status(500).send("Error updating event dates and ticket inventory");
   }
 };
 
