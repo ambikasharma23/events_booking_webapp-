@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true,
       allowNull: false,
     },
-    session_name: {
+    session: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -57,7 +57,7 @@ module.exports = (sequelize, DataTypes) => {
     });
     session.hasMany(models.ticket, {
       foreignKey: 'session_id',
-      as: 'tickets'
+      as: 'ticket'
     });
   };
 

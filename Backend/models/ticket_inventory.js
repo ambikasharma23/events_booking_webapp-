@@ -38,5 +38,12 @@ module.exports = (sequelize, DataTypes) => {
 
     });
 
+    ticket_inventory.associate = (models) => {
+        ticket_inventory.belongsTo(models.ticket, {
+          foreignKey: "ticket_id",
+          as: "ticket",
+        });
+      };
+
     return ticket_inventory;
 };
