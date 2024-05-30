@@ -3,60 +3,95 @@ const Ticket = db.ticket;
 const Session = db.session;
 const Event = db.events;
 
-const getTicket = async(req,res)=>{
-  try{
-  const sessionId = req.query.session_id;
-  let results;
-  if (sessionId) {
-    results = await Ticket.findOne({ where: { session_id: sessionId } });
+const getTicket = async (req, res) => {
+  try {
+    const sessionId = req.query.session_id;
+    let results;
+    if (sessionId) {
+      results = await Ticket.findOne({ where: { session_id: sessionId } });
+    }
+    res.status(200).send(results);
+  } catch (error) {
+    console.error("Error handling request:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
-  res.status(200).send(results);
-}catch (error) {
-  console.error("Error handling request:", error);
-  res.status(500).json({ error: "Internal Server Error" });
-}
-}
+};
 
 const createTicket = async (req, res) => {
   try {
-    const { session_id, ticket_date, ticket_name, cost, actual_price, display_price, capacity } = req.body;
-
-    // Fetch the session and its associated event
-    const session = await Session.findOne({
-      where: { id: session_id },
-      include: [{ model: Event, as: 'events' }],
-    });
-
-    if (!session || !session.events) {
-      return res.status(400).json({ error: "Session or associated event not found" });
-    }
-
-    // Extract the start_date and end_date from the associated event
-    const { start_date, end_date } = session.events;
-
-    // Validate ticket_date
-    if (new Date(ticket_date) < new Date(start_date) || new Date(ticket_date) > new Date(end_date)) {
-      return res.status(400).json({ error: "ticket_date must be within the event's start_date and end_date range" });
-    }
-
-    // Create the ticket with the validated ticket_date
-    const ticket = await Ticket.create({
+    const {
       session_id,
-      ticket_date,
       ticket_name,
       cost,
       actual_price,
       display_price,
       capacity,
+    } = req.body;
+
+    const session = await Session.findOne({
+      where: { id: session_id },
+      include: [{ model: Event, as: "events" }],
     });
 
-    res.status(201).json({ ticket });
+    if (!session || !session.events) {
+      return res
+        .status(400)
+        .json({ error: "Session or associated event not found" });
+    }
+
+    const { start_date, end_date, recurrent_type } = session.events;
+    const startDate = new Date(start_date);
+    const endDate = end_date ? new Date(end_date) : null;
+
+    const ticketPromises = [];
+
+    if (endDate) {
+      let d = new Date(startDate);
+      while (d <= endDate) {
+        const ticketDate = new Date(d);
+        ticketPromises.push(
+          Ticket.create({
+            session_id,
+            ticket_date: ticketDate,
+            ticket_name,
+            cost,
+            actual_price,
+            display_price,
+            capacity,
+          })
+        );
+        if (recurrent_type === "daily") {
+          d = new Date(d.setDate(d.getDate() + 1));
+        }
+        if (recurrent_type === "weekly") {
+          d = new Date(d.setDate(d.getDate() + 7));
+        } else if (recurrent_type === "monthly") {
+          d = new Date(d.setMonth(d.getMonth() + 1));
+        } else {
+          break; 
+        }
+      }
+    } else {
+      ticketPromises.push(
+        Ticket.create({
+          session_id,
+          ticket_date: startDate,
+          ticket_name,
+          cost,
+          actual_price,
+          display_price,
+          capacity,
+        })
+      );
+    }
+
+    const tickets = await Promise.all(ticketPromises);
+    res.status(201).json({ tickets });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Error during insertion" });
   }
 };
-
 
 const updateTicket = async (req, res) => {
   try {
@@ -95,5 +130,5 @@ module.exports = {
   createTicket,
   updateTicket,
   deleteTicket,
-  getTicket
+  getTicket,
 };
