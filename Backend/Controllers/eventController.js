@@ -1,6 +1,7 @@
 const db = require("../models");
 const { Op } = require("sequelize");
 const Event = db.events;
+const Session = db.session;
 const EventException = db.event_exception;
 const City = db.cities;
 const moment = require("moment");
@@ -116,7 +117,8 @@ const getNightEvents = async (req, res) => {
     const lateTime = "19:00:00";
     const results = await Event.findAll({
       include: {
-        model: sessions,
+        model: Session,
+        as: "session",
         where: {
           start_time: {
             [Op.gt]: lateTime,

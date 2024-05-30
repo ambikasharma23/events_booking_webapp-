@@ -69,9 +69,7 @@ module.exports = (sequelize, DataTypes) => {
   ticket.addHook("afterCreate", async (ticket, options) => {
     const { ticket_inventory } = sequelize.models;
     try {
-      // Fetch the capacity from the ticket
       const { capacity } = await ticket.reload();
-      // Create the ticket_inventory entry with quantity set to the capacity
       await ticket_inventory.create({
         ticket_id: ticket.id,
         quantity: capacity,

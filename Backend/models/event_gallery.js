@@ -1,5 +1,3 @@
-// eventGallery.js
-
 module.exports = (sequelize, DataTypes) => {
     const event_gallery = sequelize.define('event_gallery', {
       id: {

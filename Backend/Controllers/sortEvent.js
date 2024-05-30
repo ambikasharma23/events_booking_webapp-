@@ -3,17 +3,18 @@ const Event = db.events;
 const Ticket = db.ticket;
 const Session = db.session;
 
-const eventDate=async(req,res)=>{
-  try{
-  const results = await Event.findAll({
-    order: [["start_date", "ASC"]],
-  })
-  res.status(200).json(results);
-}
-catch (error) {
-  console.error(error);
-  res.status(500).json({ error: "Error while sorting events on the basis of date" });
-}
+const eventDate = async (req, res) => {
+  try {
+    const results = await Event.findAll({
+      order: [["start_date", "ASC"]],
+    });
+    res.status(200).json(results);
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: "Error while sorting events on the basis of date" });
+  }
 };
 
 const eventCost = async (req, res) => {
@@ -21,20 +22,20 @@ const eventCost = async (req, res) => {
     const sort = req.query.sort;
 
     if (sort === "asc") {
-      order = [["sessions", "tickets", "display_price", "ASC"]];
+      order = [["session", "ticket", "display_price", "ASC"]];
     }
     if (sort === "desc") {
-      order = [["sessions", "tickets", "display_price", "DESC"]];
+      order = [["session", "ticket", "display_price", "DESC"]];
     }
     const events = await Event.findAll({
       include: [
         {
           model: Session,
-          as: "sessions",
+          as: "session",
           include: [
             {
               model: Ticket,
-              as: "tickets",
+              as: "ticket",
               attributes: ["display_price"],
             },
           ],

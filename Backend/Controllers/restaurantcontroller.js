@@ -1,5 +1,5 @@
 const { Op } = require('sequelize');
-const { restaurant, events } = require('../models'); // Ensure the correct import statement
+const { restaurant, events } = require('../models'); 
 
 // Haversine function to calculate distance between two points
 function haversineDistance(lat1, lon1, lat2, lon2) {
@@ -18,8 +18,8 @@ const getNearbyEvents = async (req, res) => {
   try {
     const restaurants = await restaurant.findAll({
       include: {
-        model: events, // Use the correct alias here
-        as: 'events', // Specify the alias
+        model: events, 
+        as: 'events', 
         required: true
       }
     });
@@ -27,7 +27,7 @@ const getNearbyEvents = async (req, res) => {
     const nearbyEvents = restaurants
       .filter(restaurant => {
         const distance = haversineDistance(lat, lon, restaurant.latitude, restaurant.longitude);
-        return distance <= 10000; // Adjust distance (in kilometers) as needed
+        return distance <= 10000; 
       })
       .map(restaurant => restaurant.events)
       .flat();
