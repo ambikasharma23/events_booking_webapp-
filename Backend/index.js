@@ -2,7 +2,7 @@ const express = require("express");
 const cron = require("node-cron");
 const app = express();
 const db = require("./models");
-const updateEvent = require("./Controllers/recurrentEvent");
+const recurrentEvent = require("./Controllers/recurrentEvent");
 
 const PORT = process.env.PORT || 3000;
 
@@ -13,15 +13,13 @@ app.use("/", require("./Routes/ticketRoute"));
 app.use("/", require("./Routes/eventgalleryRoute"));
 app.use("/", require("./Routes/eventexceptionRoute"));
 app.use("/", require("./Routes/bookingRoute"));
-// app.use("/", require("./Routes/ticketinverntoryRoute"));
 app.use("/", require("./Routes/sortRoute"));
 app.use("/", require("./Routes/restaurantRoute"));
 app.use("/", require("./Routes/categoryRoute"));
 
-// cron.schedule("* * * * * *", () => {
-//   // "* */3 * * *"
+// cron.schedule("*/1 * * * *", () => {
 //   console.log("Running the updateEventDates function");
-//   updateEvent();
+//   recurrentEvent();
 // });
 
 db.sequelize

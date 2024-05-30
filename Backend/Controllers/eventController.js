@@ -7,38 +7,30 @@ const moment = require("moment");
 
 const filterEvents = (events, eventExceptions) => {
   const currentDate = new Date();
-  const formatDate = moment(currentDate).format("YYYY-MM-DD");
+  const formatCurrentDate = moment(currentDate).format("YYYY-MM-DD");
   const currentDay = currentDate.getDay();
   console.log(currentDay);
 
   return events.filter((event) => {
     const isException = eventExceptions.some((exception) => {
-      const startDate = exception.start_date
-        ? new Date(exception.start_date)
-        : null;
+      const startDate = exception.start_date ? new Date(exception.start_date) : null;
       const endDate = exception.end_date ? new Date(exception.end_date) : null;
-      const formatStart = startDate
-        ? moment(startDate).format("YYYY-MM-DD")
-        : null;
-      const formatEnd = endDate ? moment(endDate).format("YYYY-MM-DD") : null;
+      const exceptionStart = startDate ? moment(startDate).format("YYYY-MM-DD") : null;
+      const exceptionEnd = endDate ? moment(endDate).format("YYYY-MM-DD") : null;
 
       return (
         exception.event_id === event.id &&
-        ((!startDate &&
-          !endDate &&
-          exception.day &&
-          currentDay === exception.day) ||
-          !startDate ||
-          formatStart <= formatDate ||
-          !endDate ||
-          formatEnd >= formatDate ||
+        ((!startDate && !endDate && exception.day &&
+          currentDay === exception.day) || !startDate ||
+          exceptionStart === formatCurrentDate || !endDate ||
+          exceptionEnd >= formatCurrentDate ||
           ((!exception.day || currentDay === exception.day) &&
             (!exception.session_id ||
               exception.session_id === event.session_id)))
       );
     });
 
-    return !isException && moment(event.end_date).isSameOrAfter(formatDate);
+    return !isException && moment(event.end_date).isSameOrAfter(formatCurrentDate);
   });
 };
 

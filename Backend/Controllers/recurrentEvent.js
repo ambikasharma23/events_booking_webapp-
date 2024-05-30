@@ -4,7 +4,7 @@ const Session = db.session;
 const Ticket = db.ticket;
 const TicketInventory = db.ticket_inventory;
 
-const updateEvent = async () => {
+const recurrentEvent = async () => {
   try {
     const events = await Event.findAll({
       where: {
@@ -29,7 +29,7 @@ const updateEvent = async () => {
       return new Date(year, month + 1, 0).getDate();
     }
 
-    const updatePromises = events.map(async (event) => {
+    const updateDate = events.map(async (event) => {
       event.recurrent_count = (event.recurrent_count || 0) + 1;
 
       const newDate = new Date(event.start_date);
@@ -81,7 +81,7 @@ const updateEvent = async () => {
       }
     });
 
-    await Promise.all(updatePromises);
+    await Promise.all(updateDate);
     console.log("Event dates and ticket inventory updated");
     // res.status(200).send("Event dates and ticket inventory updated");
   } catch (error) {
@@ -90,4 +90,4 @@ const updateEvent = async () => {
   }
 };
 
-module.exports = updateEvent;
+module.exports = recurrentEvent;
