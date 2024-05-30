@@ -66,7 +66,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     end_date: {
       type: DataTypes.DATEONLY,
-      allowNull: false,
+      allowNull: true,
     },
     is_Recurrent: {
       type: DataTypes.BOOLEAN,
@@ -107,7 +107,7 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     events.belongsTo(models.restaurant, {
-      foreignKey: "restaurant_id", 
+      foreignKey: "restaurant_id",
       as: "restaurant",
     });
   };
