@@ -49,7 +49,7 @@ const deleteTicket = async (req, res) => {
       where: { id: id },
     });
     if (deleted) {
-      res.status(204).send();
+      res.status(204).send("Ticket Deleted Successfully");
     } else {
       throw new Error("Ticket not found");
     }

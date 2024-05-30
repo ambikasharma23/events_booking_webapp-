@@ -5,10 +5,10 @@ const sessionController = require('../Controllers/sessionscontroller');
 // Create a session for an event
 router.post('/session', sessionController.createSession);
 
-router.put('/:id', sessionController.updateSession);
+router.put('/session/:id', sessionController.updateSession);
 
-router.delete('/:id', sessionController.deleteSession);
+router.delete('/session/:id', sessionController.deleteSession);
 
-router.get('/session/:eventId', sessionController.getSessionsByEventId);
+router.get('/session/event/:eventId', sessionController.getSessionsByEventId);
 
 module.exports = router;

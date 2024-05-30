@@ -1,4 +1,4 @@
-const db = require('../models');
+const db = require("../models");
 const EventException = db.event_exception;
 
 const createEventException = async (req, res) => {
@@ -14,13 +14,13 @@ const updateEventException = async (req, res) => {
   try {
     const { id } = req.params;
     const [updated] = await EventException.update(req.body, {
-      where: { id }
+      where: { id },
     });
     if (updated) {
       const updatedEventException = await EventException.findByPk(id);
       res.status(200).json(updatedEventException);
     } else {
-      throw new Error('Event Exception not found');
+      throw new Error("Event Exception not found");
     }
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -31,12 +31,12 @@ const deleteEventException = async (req, res) => {
   try {
     const { id } = req.params;
     const deleted = await EventException.destroy({
-      where: { id }
+      where: { id },
     });
     if (deleted) {
-      res.status(204).send();
+      res.status(204).send("Event Exceptio deleted successfully");
     } else {
-      throw new Error('Event Exception not found');
+      throw new Error("Event Exception not found");
     }
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -46,5 +46,5 @@ const deleteEventException = async (req, res) => {
 module.exports = {
   createEventException,
   updateEventException,
-  deleteEventException
+  deleteEventException,
 };

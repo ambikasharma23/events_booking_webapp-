@@ -34,7 +34,7 @@ const deleteSession = async (req, res) => {
       where: { id: id },
     });
     if (deleted) {
-      res.status(204).send();
+      res.status(204).send("Event deleted successfully");
     } else {
       throw new Error("Session not found");
     }
@@ -58,8 +58,6 @@ const getSessionsByEventId = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
-
-
 
 module.exports = {
   createSession,

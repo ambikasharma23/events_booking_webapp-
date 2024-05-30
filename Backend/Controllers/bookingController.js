@@ -62,8 +62,25 @@ const getBookings = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+const getBookingByCustId = async (req, res) => {
+  try {
+    const { custId } = req.params;
+    const bookings = await event_booking.findAll({
+      where: { customer_id : custId },
+    });
+    if (bookings && bookings.length > 0) {
+      res.status(200).json(bookings);
+    } else {
+      throw new Error("Booking not found for the customer");
+    }
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
 
 module.exports = {
   createBooking,
-  getBookings
+  getBookings,
+  getBookingByCustId
 };
