@@ -18,11 +18,6 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
 
-    start_date: {
-      type: DataTypes.DATEONLY,
-      allowNull: false,
-    },
-
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
