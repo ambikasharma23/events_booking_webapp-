@@ -13,10 +13,6 @@ module.exports = (sequelize, DataTypes) => {
         key: "id",
       },
     },
-    ticket_date:{
-      type: DataTypes.DATEONLY,
-      allowNull:false,
-    },
     ticket_name: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -69,10 +65,13 @@ module.exports = (sequelize, DataTypes) => {
   ticket.addHook("afterCreate", async (ticket, options) => {
     const { ticket_inventory } = sequelize.models;
     try {
+      // Fetch the capacity from the ticket
       const { capacity } = await ticket.reload();
+      // Create the ticket_inventory entry with quantity set to the capacity
       await ticket_inventory.create({
         ticket_id: ticket.id,
         quantity: capacity,
+        start_date: new Date(),
       });
     } catch (error) {
       console.error("Error creating ticket_inventory:", error);
