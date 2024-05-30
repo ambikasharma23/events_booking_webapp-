@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
     event_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
+      refrences: {
         model: "events",
         key: "id",
       },
@@ -53,7 +53,7 @@ module.exports = (sequelize, DataTypes) => {
   session.associate = (models) => {
     session.belongsTo(models.events, {
       foreignKey: 'event_id',
-      as: 'event'
+      as: 'events'
     });
     session.hasMany(models.ticket, {
       foreignKey: 'session_id',

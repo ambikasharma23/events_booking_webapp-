@@ -13,6 +13,10 @@ module.exports = (sequelize, DataTypes) => {
         key: "id",
       },
     },
+    ticket_date:{
+      type: DataTypes.DATEONLY,
+      allowNull:false,
+    },
     ticket_name: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -69,7 +73,6 @@ module.exports = (sequelize, DataTypes) => {
       await ticket_inventory.create({
         ticket_id: ticket.id,
         quantity: capacity,
-        start_date: new Date(),
       });
     } catch (error) {
       console.error("Error creating ticket_inventory:", error);

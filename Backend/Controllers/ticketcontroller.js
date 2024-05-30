@@ -1,5 +1,7 @@
 const db = require("../models");
 const Ticket = db.ticket;
+const Session = db.session;
+const Event = db.events;
 
 const getTicket = async(req,res)=>{
   try{
@@ -17,13 +19,44 @@ const getTicket = async(req,res)=>{
 
 const createTicket = async (req, res) => {
   try {
-    const ticket = await Ticket.create(req.body);
+    const { session_id, ticket_date, ticket_name, cost, actual_price, display_price, capacity } = req.body;
+
+    // Fetch the session and its associated event
+    const session = await Session.findOne({
+      where: { id: session_id },
+      include: [{ model: Event, as: 'events' }],
+    });
+
+    if (!session || !session.events) {
+      return res.status(400).json({ error: "Session or associated event not found" });
+    }
+
+    // Extract the start_date and end_date from the associated event
+    const { start_date, end_date } = session.events;
+
+    // Validate ticket_date
+    if (new Date(ticket_date) < new Date(start_date) || new Date(ticket_date) > new Date(end_date)) {
+      return res.status(400).json({ error: "ticket_date must be within the event's start_date and end_date range" });
+    }
+
+    // Create the ticket with the validated ticket_date
+    const ticket = await Ticket.create({
+      session_id,
+      ticket_date,
+      ticket_name,
+      cost,
+      actual_price,
+      display_price,
+      capacity,
+    });
+
     res.status(201).json({ ticket });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Error during insertion" });
   }
 };
+
 
 const updateTicket = async (req, res) => {
   try {
