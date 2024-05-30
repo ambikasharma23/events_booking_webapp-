@@ -1,7 +1,5 @@
 const db = require("../models");
 const Ticket = db.ticket;
-const Session = db.session;
-const Event = db.events;
 
 const getTicket = async (req, res) => {
   try {
@@ -117,7 +115,7 @@ const deleteTicket = async (req, res) => {
       where: { id: id },
     });
     if (deleted) {
-      res.status(204).send("Ticket Deleted Successfully");
+      res.status(204).send();
     } else {
       throw new Error("Ticket not found");
     }
