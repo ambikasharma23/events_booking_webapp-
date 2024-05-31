@@ -1,5 +1,7 @@
 const db = require("../models");
+const Session = db.session;
 const Ticket = db.ticket;
+const Event = db.events;
 
 const getTicket = async (req, res) => {
   try {
@@ -47,6 +49,7 @@ const createTicket = async (req, res) => {
       let d = new Date(startDate);
       while (d <= endDate) {
         const ticketDate = new Date(d);
+
         ticketPromises.push(
           Ticket.create({
             session_id,
@@ -58,6 +61,9 @@ const createTicket = async (req, res) => {
             capacity,
           })
         );
+
+        // console.log(Creating ticket for date: ${ticketDate.toISOString()});
+
         if (recurrent_type === "daily") {
           d.setDate(d.getDate() + 1);
         } else if (recurrent_type === "weekly") {
@@ -65,9 +71,9 @@ const createTicket = async (req, res) => {
         } else if (recurrent_type === "biweekly") {
           d.setDate(d.getDate() + 14);
         } else if (recurrent_type === "monthly") {
-          d = new Date(d.setMonth(d.getMonth() + 1));
+          d.setMonth(d.getMonth() + 1);
         } else {
-          break; 
+          break;
         }
       }
     } else {
@@ -88,7 +94,7 @@ const createTicket = async (req, res) => {
     res.status(201).json({ tickets });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Error during insertion" });
+    res.status(500).json({ error: "Error during ticket creation" });
   }
 };
 
