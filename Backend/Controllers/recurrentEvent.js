@@ -30,7 +30,8 @@ const recurrentEvent = async () => {
     }
 
     const updateDate = events.map(async (event) => {
-      event.recurrent_count = event.recurrent_count + 1;
+      event.recurrent_count = (event.recurrent_count || 0) + 1;
+
       const newDate = new Date(event.start_date);
       let shouldUpdate = false;
 
@@ -73,6 +74,7 @@ const recurrentEvent = async () => {
       if (shouldUpdate) {
         event.start_date = newDate;
 
+        // Update ticket inventory capacity
         for (const session of event.session) {
           for (const ticket of session.ticket) {
             if (ticket.ticket_inventory) {
@@ -81,14 +83,17 @@ const recurrentEvent = async () => {
             }
           }
         }
+
+        await event.save();
       }
-      await event.save();
     });
 
     await Promise.all(updateDate);
     console.log("Event dates and ticket inventory updated");
+    // res.status(200).send("Event dates and ticket inventory updated");
   } catch (error) {
     console.error("Error updating event dates and ticket inventory:", error);
+    // res.status(500).send("Error updating event dates and ticket inventory");
   }
 };
 
