@@ -1,5 +1,7 @@
 const db = require("../models");
+const Session = db.session;
 const Ticket = db.ticket;
+const Event = db.events;
 
 const getTicket = async (req, res) => {
   try {
@@ -66,7 +68,7 @@ const createTicket = async (req, res) => {
         } else if (recurrent_type === "monthly") {
           d = new Date(d.setMonth(d.getMonth() + 1));
         } else {
-          break; 
+          break;
         }
       }
     } else {
