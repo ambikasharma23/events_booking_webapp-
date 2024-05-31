@@ -59,10 +59,11 @@ const createTicket = async (req, res) => {
           })
         );
         if (recurrent_type === "daily") {
-          d = new Date(d.setDate(d.getDate() + 1));
-        }
-        if (recurrent_type === "weekly") {
-          d = new Date(d.setDate(d.getDate() + 7));
+          d.setDate(d.getDate() + 1);
+        } else if (recurrent_type === "weekly") {
+          d.setDate(d.getDate() + 7);
+        } else if (recurrent_type === "biweekly") {
+          d.setDate(d.getDate() + 14);
         } else if (recurrent_type === "monthly") {
           d = new Date(d.setMonth(d.getMonth() + 1));
         } else {

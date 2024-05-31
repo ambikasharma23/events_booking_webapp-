@@ -38,7 +38,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.TEXT,
     },
     recurrent_type: {
-      type: DataTypes.ENUM("daily", "weekly", "monthly", "yearly"),
+      type: DataTypes.ENUM("daily", "weekly", "monthly", "yearly", "biweekly"),
       allowNull: true,
     },
     recurrent_count: {
