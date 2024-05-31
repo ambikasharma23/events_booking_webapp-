@@ -48,7 +48,7 @@ const recurrentEvent = async () => {
           }
           break;
         case "biweekly":
-          if (event.recurrent_count > 7) {
+          if (event.recurrent_count > 14) {
             newDate.setDate(newDate.getDate() + 14);
             shouldUpdate = true;
             event.recurrent_count = 0;

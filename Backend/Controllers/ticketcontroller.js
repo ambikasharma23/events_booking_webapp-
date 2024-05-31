@@ -68,6 +68,8 @@ const createTicket = async (req, res) => {
           d.setDate(d.getDate() + 1);
         } else if (recurrent_type === "weekly") {
           d.setDate(d.getDate() + 7);
+        } else if (recurrent_type === "biweekly") {
+          d.setDate(d.getDate() + 14);
         } else if (recurrent_type === "monthly") {
           d.setMonth(d.getMonth() + 1);
         } else {
