@@ -48,6 +48,13 @@ const recurrentEvent = async () => {
             event.recurrent_count = 0;
           }
           break;
+        case "biweekly":
+          if (event.recurrent_count > 7) {
+            newDate.setDate(newDate.getDate() + 14);
+            shouldUpdate = true;
+            event.recurrent_count = 0;
+          }
+          break;
         case "monthly":
           const month = newDate.getMonth();
           const year = newDate.getFullYear();
