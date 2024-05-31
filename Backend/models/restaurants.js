@@ -42,10 +42,10 @@ module.exports = (sequelize, DataTypes) => {
     //   },
     // },
     latitude: {
-      type: DataTypes.DECIMAL, 
+      type: DataTypes.DECIMAL(11,8), 
     },
     longitude: {
-      type: DataTypes.DECIMAL,
+      type: DataTypes.DECIMAL(11,8),
       allowNull: true,
     },
     createdAt: {

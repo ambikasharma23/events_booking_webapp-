@@ -36,14 +36,15 @@ module.exports = {
         created_at: new Date(),
         updated_at: new Date()
       },
+      
       {
-        restaurant_name: 'Infinity Burger',
+        restaurant_name: 'AMA CAfe ',
         url: 'https://www.restaurantB.com',
         
-        location_name: ' Shop 14, B5, DDA Market, Humayunpur, Safdarjung Enclave, New Delhi, Delhi 110029',
+        location_name: ' AMA Cafe, House no. 6, 1st Floor, Majnu-ka-tilla, New Aruna Nagar, New Delhi, Delhi 110054',
         // event_id: 2, // Replace with the actual event ID if needed
-        latitude: 28.569795251641626, // Replace with actual latitude value
-        longitude: 77.19302301615063, // Replace with actual longitude value
+        latitude: 28.71260766996972, // Replace with actual latitude value
+        longitude: 77.23006108918806, // Replace with actual longitude value
         created_at: new Date(),
         updated_at: new Date()
       },
