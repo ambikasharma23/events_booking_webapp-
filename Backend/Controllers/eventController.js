@@ -2,6 +2,7 @@ const db = require("../models");
 const { Op } = require("sequelize");
 const Event = db.events;
 const EventException = db.event_exception;
+const Session = db.session;
 const City = db.cities;
 const moment = require("moment");
 
@@ -13,16 +14,26 @@ const filterEvents = (events, eventExceptions) => {
 
   return events.filter((event) => {
     const isException = eventExceptions.some((exception) => {
-      const startDate = exception.start_date ? new Date(exception.start_date) : null;
+      const startDate = exception.start_date
+        ? new Date(exception.start_date)
+        : null;
       const endDate = exception.end_date ? new Date(exception.end_date) : null;
-      const exceptionStart = startDate ? moment(startDate).format("YYYY-MM-DD") : null;
-      const exceptionEnd = endDate ? moment(endDate).format("YYYY-MM-DD") : null;
+      const exceptionStart = startDate
+        ? moment(startDate).format("YYYY-MM-DD")
+        : null;
+      const exceptionEnd = endDate
+        ? moment(endDate).format("YYYY-MM-DD")
+        : null;
 
       return (
         exception.event_id === event.id &&
-        ((!startDate && !endDate && exception.day &&
-          currentDay === exception.day) || !startDate ||
-          exceptionStart === formatCurrentDate || !endDate ||
+        ((!startDate &&
+          !endDate &&
+          exception.day &&
+          currentDay === exception.day) ||
+          !startDate ||
+          exceptionStart === formatCurrentDate ||
+          !endDate ||
           exceptionEnd >= formatCurrentDate ||
           ((!exception.day || currentDay === exception.day) &&
             (!exception.session_id ||
@@ -30,7 +41,9 @@ const filterEvents = (events, eventExceptions) => {
       );
     });
 
-    return !isException && moment(event.end_date).isSameOrAfter(formatCurrentDate);
+    return (
+      !isException && moment(event.end_date).isSameOrAfter(formatCurrentDate)
+    );
   });
 };
 
@@ -108,7 +121,8 @@ const getNightEvents = async (req, res) => {
     const lateTime = "19:00:00";
     const results = await Event.findAll({
       include: {
-        model: sessions,
+        model: Session,
+        as: "session",
         where: {
           start_time: {
             [Op.gt]: lateTime,

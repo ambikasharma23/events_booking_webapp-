@@ -49,6 +49,7 @@ const createTicket = async (req, res) => {
       let d = new Date(startDate);
       while (d <= endDate) {
         const ticketDate = new Date(d);
+
         ticketPromises.push(
           Ticket.create({
             session_id,
@@ -60,13 +61,15 @@ const createTicket = async (req, res) => {
             capacity,
           })
         );
+
+        console.log(`Creating ticket for date: ${ticketDate.toISOString()}`);
+
         if (recurrent_type === "daily") {
-          d = new Date(d.setDate(d.getDate() + 1));
-        }
-        if (recurrent_type === "weekly") {
-          d = new Date(d.setDate(d.getDate() + 7));
+          d.setDate(d.getDate() + 1);
+        } else if (recurrent_type === "weekly") {
+          d.setDate(d.getDate() + 7);
         } else if (recurrent_type === "monthly") {
-          d = new Date(d.setMonth(d.getMonth() + 1));
+          d.setMonth(d.getMonth() + 1);
         } else {
           break;
         }
@@ -89,7 +92,7 @@ const createTicket = async (req, res) => {
     res.status(201).json({ tickets });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Error during insertion" });
+    res.status(500).json({ error: "Error during ticket creation" });
   }
 };
 
