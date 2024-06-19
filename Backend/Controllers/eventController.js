@@ -1,87 +1,77 @@
 const db = require("../models");
 const { Op } = require("sequelize");
 const Event = db.events;
-const EventException = db.event_exception;
 const Session = db.session;
-const City = db.cities;
 const moment = require("moment");
 
-const filterEvents = (events, eventExceptions) => {
-  const currentDate = new Date();
-  const formatCurrentDate = moment(currentDate).format("YYYY-MM-DD");
-  const currentDay = currentDate.getDay();
-  console.log(currentDay);
+// const filterEvents = (events, eventExceptions) => {
+//   const currentDate = new Date();
+//   const formatCurrentDate = moment(currentDate).format("YYYY-MM-DD");
+//   const currentDay = currentDate.getDay();
+//   console.log(currentDay);
 
-  return events.filter((event) => {
-    const isException = eventExceptions.some((exception) => {
-      const startDate = exception.start_date
-        ? new Date(exception.start_date)
-        : null;
-      const endDate = exception.end_date ? new Date(exception.end_date) : null;
-      const exceptionStart = startDate
-        ? moment(startDate).format("YYYY-MM-DD")
-        : null;
-      const exceptionEnd = endDate
-        ? moment(endDate).format("YYYY-MM-DD")
-        : null;
+//   return events.filter((event) => {
+//     const isException = eventExceptions.some((exception) => {
+//       const startDate = exception.start_date
+//         ? new Date(exception.start_date)
+//         : null;
+//       const endDate = exception.end_date ? new Date(exception.end_date) : null;
+//       const exceptionStart = startDate
+//         ? moment(startDate).format("YYYY-MM-DD")
+//         : null;
+//       const exceptionEnd = endDate
+//         ? moment(endDate).format("YYYY-MM-DD")
+//         : null;
 
-      return (
-        exception.event_id === event.id &&
-        ((!startDate &&
-          !endDate &&
-          exception.day &&
-          currentDay === exception.day) ||
-          !startDate ||
-          exceptionStart === formatCurrentDate ||
-          !endDate ||
-          exceptionEnd >= formatCurrentDate ||
-          ((!exception.day || currentDay === exception.day) &&
-            (!exception.session_id ||
-              exception.session_id === event.session_id)))
-      );
-    });
+//       return (
+//         exception.event_id === event.id &&
+//         ((!startDate &&
+//           !endDate &&
+//           exception.day &&
+//           currentDay === exception.day) ||
+//           !startDate ||
+//           exceptionStart === formatCurrentDate ||
+//           !endDate ||
+//           exceptionEnd >= formatCurrentDate ||
+//           ((!exception.day || currentDay === exception.day) &&
+//             (!exception.session_id ||
+//               exception.session_id === event.session_id)))
+//       );
+//     });
 
-    return (
-      !isException && moment(event.end_date).isSameOrAfter(formatCurrentDate)
-    );
-  });
-};
+//     return (
+//       !isException && moment(event.end_date).isSameOrAfter(formatCurrentDate)
+//     );
+//   });
+// };
 
 const getEvents = async (req, res) => {
   try {
-    const [events, eventExceptions] = await Promise.all([
-      Event.findAll(),
-      EventException.findAll(),
-    ]);
-    const visibleEvents = filterEvents(events, eventExceptions);
-    const {
-      id: eventId,
-      event_name: eventName,
-      name: cityName,
-      region_id: region,
-      category_id: category,
-      search: searchQuery,
-    } = req.query;
+    const eventId = req.query.id;
+    const eventName = req.query.event_name;
+    const cityName = req.query.name;
+    const region = req.query.region_id;
+    const category = req.query.category_id;
+    const searchQuery = req.query.search;
 
     let results;
     if (eventId) {
-      results = visibleEvents.find((event) => event.id == eventId);
+      results = await Event.findOne({ where: { id: eventId } });
     } else if (eventName) {
-      results = visibleEvents.find((event) => event.event_name === eventName);
-    } else if (cityName) {
-      results = visibleEvents.filter((event) => event.city.name === cityName);
-    } else if (region) {
-      results = visibleEvents.filter((event) => event.region_id == region);
+      results = await Event.findOne({ where: { event_name: eventName } });
     } else if (category) {
-      results = visibleEvents.filter((event) => event.category_id == category);
+      results = await Event.findAll({ where: { category_id: category } });
     } else if (searchQuery) {
-      results = visibleEvents.filter(
-        (event) =>
-          event.event_name.includes(searchQuery) ||
-          event.event_description.includes(searchQuery)
-      );
+      results = await Event.findAll({
+        where: {
+          [Op.or]: [
+            { event_name: { [Op.like]: `%${searchQuery}%` } },
+            { event_description: { [Op.like]: `%${searchQuery}%` } },
+          ],
+        },
+      });
     } else {
-      results = visibleEvents;
+      results = await Event.findAll();
     }
 
     res.status(200).send(results);
@@ -90,6 +80,7 @@ const getEvents = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
 const EventsthisWeak = async (req, res) => {
   try {
     const today = new Date();

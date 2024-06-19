@@ -7,13 +7,13 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       autoIncrement: true,
     },
-    event_id: {
+    session_id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
       references: {
-        model: "events",
+        model: "sessions",
         key: "id",
       },
+      allowNull: true,
     },
     start_date: {
       type: DataTypes.DATEONLY,
@@ -25,14 +25,6 @@ module.exports = (sequelize, DataTypes) => {
     },
     day: {
       type: DataTypes.STRING,
-      allowNull: true,
-    },
-    session_id: {
-      type: DataTypes.INTEGER,
-      references: {
-        model: "sessions",
-        key: "id",
-      },
       allowNull: true,
     },
 
@@ -53,5 +45,12 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: DataTypes.NOW,
     },
   });
+
+  event_exception.associate = (models) => {
+    event_exception.belongsTo(models.session, {
+      foreignKey: "session_id",
+      as: "session",
+    });
+  };
   return event_exception;
 };
