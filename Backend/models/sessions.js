@@ -59,6 +59,10 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'session_id',
       as: 'ticket'
     });
+    session.hasMany(models.event_exception, {
+      foreignKey: 'session_id',
+      as: 'event_exceptions'
+    });
   };
 
   return session;
