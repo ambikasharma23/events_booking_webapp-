@@ -29,15 +29,15 @@ export default function Category() {
             <section className="text-gray-100 body-font">
                 <div className="container mx-auto">
                     <div className="grid grid-cols-4 md:grid-cols-8 gap-4">
-                        {categories.map((categories) => (
-                            <div className="p-1 md:p-4 w-full" key={categories.id}>
+                        {categories.map((category) => (
+                            <div className="p-1 md:p-4 w-full" key={category.id}>
                                 <div className="h-full border-2 border-gray-200 border-opacity-10 rounded-lg overflow-hidden">
                                     <img
                                         className="h-10 md:h-20 w-full object-cover object-center"
-                                        src={categories.icon}
+                                        src={category.icon}
                                     />
                                     <h4 className="title-font text-sm font-medium text-gray-900 text-white text-center">
-                                        {categories.name}
+                                        {category.name}
                                     </h4>
                                 </div>
                             </div>
