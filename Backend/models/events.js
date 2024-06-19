@@ -41,10 +41,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.ENUM("daily", "weekly", "monthly", "yearly", "biweekly"),
       allowNull: true,
     },
-    recurrent_count: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0,
-    },
     custom_day: {
       type: DataTypes.TEXT,
       allowNull: true,
@@ -71,10 +67,6 @@ module.exports = (sequelize, DataTypes) => {
     is_Recurrent: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
-    },
-    isVisible: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: true,
     },
     tags: {
       type: DataTypes.TEXT,
@@ -113,3 +105,4 @@ module.exports = (sequelize, DataTypes) => {
   };
   return events;
 };
+

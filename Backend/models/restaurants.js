@@ -13,14 +13,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    // city_id: {
-    //   type: DataTypes.INTEGER,
-    //   allowNull: false,
-    //   references: {
-    //     model: "city",
-    //     key: "id",
-    //   },
-    // },
+    city_id: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: false,
+      references: {
+        model: "cities",
+        key: "id",
+      },
+    },
     // region_id: {
     //   type: DataTypes.INTEGER,
     //   allowNull: false,
@@ -67,7 +67,13 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: "restaurant_id",
       as: "events",
     });
+    restaurant.belongsTo(models.City, {
+      foreignKey: "city_id",
+      as: "city",
+    });
   };
+
   
+
   return restaurant;
 };
