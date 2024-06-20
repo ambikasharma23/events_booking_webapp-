@@ -28,7 +28,7 @@ export default function Category() {
 
     return (
         <>
-            <h1 className="text-white mx-20 font-bold">What are you looking at?</h1>
+            <h1 className="text-white mx-20 my-10 font-bold">What are you looking at?</h1>
 
             <section className="text-gray-100 body-font">
                 <div className="container mx-auto">

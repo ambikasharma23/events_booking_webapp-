@@ -30,7 +30,7 @@ export default function Dance() {
 
   return (
     <>
-      <h1 className="text-white mx-20 font-bold p-5">Dance Shows</h1>
+      <h1 className="text-white mx-20 my-1 font-bold p-5">Dance Shows</h1>
 
       <section className="text-gray-100 body-font">
         <div className="container mx-auto">
