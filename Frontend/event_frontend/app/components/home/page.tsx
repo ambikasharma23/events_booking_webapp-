@@ -68,7 +68,7 @@ export default function HomePage() {
       <header className="flex justify-between items-center p-2 md:px-8 md:py-5"> {/* Adjusted padding */}
         <div className="flex items-center space-x-8">
           <div className="flex items-center space-x-0">
-            <img src={titlelogo.src} alt="Logo" className="h-12 w-12 mr-2" /> {/* Adjusted logo size */}
+            <img src={'/images/logo1.gif'} alt="Logo" className="h-12 w-12 mr-2" /> {/* Adjusted logo size */}
             <div className="text-sm md:text-3xl font-bold text-white">eazyEvents</div>
           </div>
           

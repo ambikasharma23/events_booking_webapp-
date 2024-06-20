@@ -1,11 +1,10 @@
 import React from "react";
-import bgImage from "./Summerimage.gif";
 import HomePage from "./page";
 
 const Image = () => {
   return (
     <>
-      <div className="relative w-full bg-cover bg-center" style={{ backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%), url('/events-background-1.jpg')`, height: '70vh' }}>
+      <div className="relative w-full bg-cover bg-center" style={{ backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%), url('/images/events-background-1.jpg')`, height: '70vh' }}>
         <div className="absolute inset-0"></div> {/* Overlay div */}
         
         <div className="fixed top-0 left-0 right-0 z-50">
@@ -14,7 +13,7 @@ const Image = () => {
 
         <div className="flex flex-col items-center justify-center h-full relative z-10">
           <img
-            src={bgImage.src}
+            src={'/images/Summerimage.gif'}
             alt="Summer GIF"
             className="mt-8 max-w-full max-h-full object-cover"
             style={{ position: "relative", zIndex: 20 }}
