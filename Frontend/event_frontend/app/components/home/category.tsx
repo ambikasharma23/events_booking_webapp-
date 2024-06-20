@@ -1,12 +1,17 @@
 "use client";
+
 import React, { useEffect, useState } from 'react';
-interface Categories {
+import CategoryEvent from './category_event';
+
+interface Category {
     id: number;
     icon: string;
     name: string;
 }
+
 export default function Category() {
-    const [categories, setCategories] = useState<Categories[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null); // Specify null or number
 
     useEffect(() => {
         const fetchData = async () => {
@@ -15,16 +20,19 @@ export default function Category() {
                 if (!response.ok) {
                     throw new Error('Failed to fetch data');
                 }
-                const data: Categories[] = await response.json();
-                console.log(data);
+                let data = await response.json();
                 setCategories(data); 
             } catch (error) {
-                console.error('Error fetching data:', error);
+                console.error('Error fetching categories:', error);
             }
         };
 
-        fetchData(); 
+        fetchData();
     }, []); 
+
+    const handleCategoryClick = (categoryId: number) => { // Specify categoryId as number
+        setSelectedCategoryId(categoryId);
+    };
 
     return (
         <>
@@ -34,11 +42,12 @@ export default function Category() {
                 <div className="container mx-auto">
                     <div className="grid grid-cols-4 md:grid-cols-8 gap-4">
                         {categories.map((category) => (
-                            <div className="p-1 md:p-4 w-full" key={category.id}>
+                            <div className="p-1 md:p-4 w-full" key={category.id} onClick={() => handleCategoryClick(category.id)}>
                                 <div className="h-full border-2 border-gray-200 border-opacity-10 rounded-lg overflow-hidden">
                                     <img
                                         className="h-10 md:h-20 w-full object-cover object-center"
                                         src={category.icon}
+                                        alt={`Icon for ${category.name}`}
                                     />
                                     <h4 className="title-font text-sm font-medium text-gray-900 text-white text-center">
                                         {category.name}
@@ -49,6 +58,11 @@ export default function Category() {
                     </div>
                 </div>
             </section>
+
+            {/* Display events related to selected category */}
+            {selectedCategoryId !== null && (
+                <CategoryEvent categoryId={selectedCategoryId} />
+            )}
         </>
     );
 }

@@ -1,7 +1,7 @@
 'use client';
 
+// components/home/category_event.tsx
 import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
 
 interface CategoryEventProps {
     categoryId: number;
@@ -9,8 +9,6 @@ interface CategoryEventProps {
 
 const CategoryEvent: React.FC<CategoryEventProps> = ({ categoryId }) => {
     const [events, setEvents] = useState<any[]>([]);
-    const router = useRouter();
-    
 
     useEffect(() => {
         const fetchEvents = async () => {
