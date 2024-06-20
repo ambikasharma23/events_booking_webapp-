@@ -8,7 +8,7 @@ import Dance from './components/home/dance';
 export default function Home() {
   return (
     <main>
-      <HomePage />
+      {/* <HomePage /> */}
       <Image />
       <Category />
       <Music />

@@ -1,5 +1,4 @@
-"use client";
-
+"use client"
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import titlelogo from './logo1.gif';
@@ -13,6 +12,28 @@ export default function HomePage() {
   const [location, setLocation] = useState<Location>({ latitude: null, longitude: null });
   const [locationError, setLocationError] = useState<string | null>(null);
   const [city, setCity] = useState<string | null>(null);
+  const [backgroundColor, setBackgroundColor] = useState<string>('transparent'); // Initialize with transparent
+
+  useEffect(() => {
+    // Add event listener for scroll
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      // Set background color based on scroll position
+      if (scrollY > 0) {
+        setBackgroundColor('rgba(0, 0, 0, 0.9)'); // Transparent black color
+      } else {
+        setBackgroundColor('transparent');
+      }
+    };
+
+    // Attach scroll event listener when component mounts
+    window.addEventListener('scroll', handleScroll);
+
+    // Clean up event listener on component unmount
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   useEffect(() => {
     if ('geolocation' in navigator) {
@@ -43,18 +64,17 @@ export default function HomePage() {
   };
 
   return (
-    <div className="font-sans">
-      <header className="flex justify-between items-center p-8 bg-gradient-to-r from-gray-800 to-black border-b border-gray-300">
+    <div className="font-sans fixed w-full" style={{ backgroundColor }}>
+      <header className="flex justify-between items-center p-2 md:px-8 md:py-5"> {/* Adjusted padding */}
         <div className="flex items-center space-x-8">
-
-        <div className="flex items-center space-x-0">
-        <img src={titlelogo.src} alt="Logo" className="h-13 w-14 mr-0" />
-        <div className="text-sm md:text-3xl font-bold text-white">eazyEvents</div>
-        </div>
-
+          <div className="flex items-center space-x-0">
+            <img src={'/images/logo1.gif'} alt="Logo" className="h-12 w-12 mr-2" /> {/* Adjusted logo size */}
+            <div className="text-sm md:text-3xl font-bold text-white">eazyEvents</div>
+          </div>
+          
           <div className="text-sm text-white">
             {location.latitude !== null && location.longitude !== null ? (
-              <div className="flex items-center bg-transparent border-2 border-white text-white pd-1 md:p-2 rounded-lg">
+              <div className="flex items-center bg-transparent border-2 border-white text-white p-1 md:p-2 rounded-lg">
                 {/* <span className="mr-2">City:</span> */}
                 <span>{city || 'Fetching city...'}</span>
               </div>
@@ -65,16 +85,15 @@ export default function HomePage() {
             )}
           </div>
         </div>
-        <div className="w-1/3 flex justify-center">
+
+        <div className="w-20 md:w-1/6 flex justify-end"> {/* Adjusted input field alignment */}
           <input
             type="text"
             placeholder="Search..."
             className="w-full px-3 py-1 rounded-lg bg-gray-200 text-gray-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-gray-300"
           />
         </div>
-        <div className="text-xl cursor-pointer">👤</div>
       </header>
-      
     </div>
   );
 }
