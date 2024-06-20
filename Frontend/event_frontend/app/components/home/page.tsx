@@ -49,13 +49,13 @@ export default function HomePage() {
 
         <div className="flex items-center space-x-0">
         <img src={titlelogo.src} alt="Logo" className="h-13 w-14 mr-0" />
-        <div className="text-3xl font-bold text-white">eazyEvents</div>
+        <div className="text-sm md:text-3xl font-bold text-white">eazyEvents</div>
         </div>
 
           <div className="text-sm text-white">
             {location.latitude !== null && location.longitude !== null ? (
-              <div className="flex items-center bg-transparent border-2 border-white text-white p-2 rounded-lg">
-                <span className="mr-2">City:</span>
+              <div className="flex items-center bg-transparent border-2 border-white text-white pd-1 md:p-2 rounded-lg">
+                {/* <span className="mr-2">City:</span> */}
                 <span>{city || 'Fetching city...'}</span>
               </div>
             ) : (
