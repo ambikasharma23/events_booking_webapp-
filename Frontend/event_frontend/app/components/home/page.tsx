@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import titleImage from './title.png';
+import Image from 'next/image';
+import titlelogo from './logo1.gif';
 
 type Location = {
   latitude: number | null;
@@ -17,11 +18,9 @@ export default function HomePage() {
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          setLocation({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          });
-          fetchCityName(position.coords.latitude, position.coords.longitude);
+          const { latitude, longitude } = position.coords;
+          setLocation({ latitude, longitude });
+          fetchCityName(latitude, longitude);
           setLocationError(null);
         },
         (error) => {
@@ -45,19 +44,27 @@ export default function HomePage() {
 
   return (
     <div className="font-sans">
-      <header className="flex justify-between items-center p-8 bg-gradient-to-r from-gray-800 to-olive border-b border-gray-300">
-        <div className="text-sm text-white">
-          {location.latitude !== null && location.longitude !== null
-            ? (
-              <div className="flex items-center bg-transparent border-2 border-white text-white p-2 rounded-lg">
-                <span className="mr-2">City:</span>
+      <header className="flex justify-between items-center p-8 bg-gradient-to-r from-gray-800 to-black border-b border-gray-300">
+        <div className="flex items-center space-x-8">
+
+        <div className="flex items-center space-x-0">
+        <img src={titlelogo.src} alt="Logo" className="h-13 w-14 mr-0" />
+        <div className="text-sm md:text-3xl font-bold text-white">eazyEvents</div>
+        </div>
+
+          <div className="text-sm text-white">
+            {location.latitude !== null && location.longitude !== null ? (
+              <div className="flex items-center bg-transparent border-2 border-white text-white pd-1 md:p-2 rounded-lg">
+                {/* <span className="mr-2">City:</span> */}
                 <span>{city || 'Fetching city...'}</span>
               </div>
-            )
-            : <div className="bg-transparent text-white p-2 rounded-lg">{locationError || 'Fetching location...'}</div>
-          }
+            ) : (
+              <div className="bg-transparent border-2 border-white text-white p-2 rounded-lg">
+                {locationError || 'Fetching location...'}
+              </div>
+            )}
+          </div>
         </div>
-        
         <div className="w-1/3 flex justify-center">
           <input
             type="text"
@@ -67,9 +74,7 @@ export default function HomePage() {
         </div>
         <div className="text-xl cursor-pointer">👤</div>
       </header>
-      <main className="p-4">
-        <h1 className="text-2xl font-bold">Welcome to the Events App</h1>
-      </main>
+      
     </div>
   );
 }
