@@ -1,8 +1,12 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-
+interface Categories {
+    id: number;
+    icon: string;
+    name: string;
+}
 export default function Category() {
-    const [categories, setCategories] = useState([]);
+    const [categories, setCategories] = useState<Categories[]>([]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -11,7 +15,7 @@ export default function Category() {
                 if (!response.ok) {
                     throw new Error('Failed to fetch data');
                 }
-                let data = await response.json();
+                const data: Categories[] = await response.json();
                 console.log(data);
                 setCategories(data); 
             } catch (error) {
