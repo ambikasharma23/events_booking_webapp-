@@ -4,6 +4,7 @@ import Image from '../app/components/home/image'
 import Music from './components/home/music';
 import Comedy from './components/home/comedy';
 import Dance from './components/home/dance';
+
 export default function Home() {
   return (
     <main>
