@@ -1,7 +1,9 @@
 const db = require("../models");
 const { Op } = require("sequelize");
 const Event = db.events;
+const City = db.City;
 const Session = db.session;
+const Category = db.event_category;
 const moment = require("moment");
 
 // const filterEvents = (events, eventExceptions) => {
@@ -47,34 +49,55 @@ const moment = require("moment");
 
 const getEvents = async (req, res) => {
   try {
-    const eventId = req.query.id;
-    const eventName = req.query.event_name;
-    const cityName = req.query.name;
-    const region = req.query.region_id;
-    const category = req.query.category_id;
-    const searchQuery = req.query.search;
+    const { id, event_name, category_id, search, event_category } = req.query;
 
-    let results;
-    if (eventId) {
-      results = await Event.findOne({ where: { id: eventId } });
-    } else if (eventName) {
-      results = await Event.findOne({ where: { event_name: eventName } });
-    } else if (category) {
-      results = await Event.findAll({ where: { category_id: category } });
-    } else if (searchQuery) {
-      results = await Event.findAll({
+    // Define the common query options
+    const queryOptions = {
+      include: [
+        {
+          model: City,
+          as: "city",
+          attributes: ["name"], // Only include the city name
+        },
+      ],
+    };
+
+    // Adjust query options based on the query parameters
+    if (id) {
+      queryOptions.where = { id };
+      const result = await Event.findOne(queryOptions);
+      res.status(200).send(result);
+    } else if (event_name) {
+      queryOptions.where = { event_name };
+      const result = await Event.findOne(queryOptions);
+      res.status(200).send(result);
+    } else if (category_id) {
+      queryOptions.where = { category_id };
+      const results = await Event.findAll(queryOptions);
+      res.status(200).send(results);
+    } else if (event_category) {
+      queryOptions.include.push({
+        model: Category,
+        as: "category",
         where: {
-          [Op.or]: [
-            { event_name: { [Op.like]: `%${searchQuery}%` } },
-            { event_description: { [Op.like]: `%${searchQuery}%` } },
-          ],
+          name: event_category,
         },
       });
+      const results = await Event.findAll(queryOptions);
+      res.status(200).send(results);
+    } else if (search) {
+      queryOptions.where = {
+        [Op.or]: [
+          { event_name: { [Op.like]: `%${search}%` } },
+          { event_description: { [Op.like]: `%${search}%` } },
+        ],
+      };
+      const results = await Event.findAll(queryOptions);
+      res.status(200).send(results);
     } else {
-      results = await Event.findAll();
+      const results = await Event.findAll(queryOptions);
+      res.status(200).send(results);
     }
-
-    res.status(200).send(results);
   } catch (error) {
     console.error("Error handling request:", error);
     res.status(500).json({ error: "Internal Server Error" });

@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
     },
     city_id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.INTEGER.UNSIGNED,
       refrences: {
         model: "city",
         key: "id",
@@ -72,6 +72,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.TEXT,
       allowNull: true,
     },
+    starting_price: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
     created_by: {
       type: DataTypes.STRING,
     },
@@ -97,12 +101,18 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: "event_id",
       as: "session",
     });
-
+    events.belongsTo(models.event_category, {
+      foreignKey: "category_id",
+      as: "category",
+    });
     events.belongsTo(models.restaurant, {
       foreignKey: "restaurant_id",
       as: "restaurant",
     });
+    events.belongsTo(models.City, {
+      foreignKey: "city_id",
+      as: "city",
+    });
   };
   return events;
 };
-
