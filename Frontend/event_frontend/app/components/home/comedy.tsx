@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { useRouter } from 'next/navigation';
+
 
 interface ComedyCat {
   id: number;
@@ -34,6 +36,8 @@ const CustomNextArrow = (props: any) => {
 
 export default function Comedy() {
   const [events, setEvents] = useState<ComedyCat[]>([]);
+  const router = useRouter();
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -90,7 +94,9 @@ export default function Comedy() {
       }
     ]
   };
-
+  const handleClick = (id: number) => {
+    router.push(`/details/${id}`);
+};
   return (
     <>
       <h1 className="text-white mx-20 my-1 font-bold p-5">Comedy Shows</h1>
@@ -99,7 +105,7 @@ export default function Comedy() {
         <div className="container mx-auto">
           <Slider {...settings}>
             {events.map((event) => (
-              <div className="p-1 w-full" key={event.id}>
+              <div className="p-1 md:p-1 w-full cursor-pointer" key={event.id} onClick={() => handleClick(event.id)}>
                 <div className="relative group h-full border-2 border-gray-200 border-opacity-10 rounded-lg overflow-hidden">
                   <img
                     className="h-28 md:h-40 w-full object-cover object-center"

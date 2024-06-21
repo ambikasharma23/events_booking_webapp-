@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { useRouter } from 'next/navigation';
+
 interface DanceCat {
   id: number;
   event_image: string;
@@ -11,6 +13,7 @@ interface DanceCat {
 
 export default function Dance() {
   const [events, setEvents] = useState<DanceCat[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -65,6 +68,9 @@ export default function Dance() {
       }
     ]
   };
+  const handleClick = (id: number) => {
+    router.push(`/details/${id}`);
+};
 
   return (
     <>
@@ -76,7 +82,7 @@ export default function Dance() {
           <Slider {...settings}>
 
             {events.map((event) => (
-              <div className="p-1 md:p-1 w-full" key={event.id}>
+              <div className="p-1 md:p-1 w-full cursor-pointer" key={event.id} onClick={() => handleClick(event.id)}>
                 <div className="h-full border-2 border-gray-200 border-opacity-10 rounded-lg overflow-hidden">
                   <img
                     className="h-28 md:h-40 w-full object-cover object-center"
