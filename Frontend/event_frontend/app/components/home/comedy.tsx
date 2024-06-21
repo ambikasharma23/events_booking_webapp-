@@ -30,11 +30,11 @@ export default function Music() {
 
   return (
     <>
-      <h1 className="text-white mx-20 font-bold p-5">Best In Experiences</h1>
+      <h1 className="text-white mx-20 my-1 font-bold p-5">Comedy Shows</h1>
 
       <section className="text-gray-100 body-font">
         <div className="container mx-auto">
-          <div className="grid grid-cols-5 md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-5 md:grid-cols-6 gap-4">
             {events.map((events) => (
               <div className="p-1 md:p-4 w-full" key={events.id}>
                 <div className="h-full border-2 border-gray-200 border-opacity-10 rounded-lg overflow-hidden">
