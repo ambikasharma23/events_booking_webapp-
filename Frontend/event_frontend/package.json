@@ -10,14 +10,25 @@
   },
   "dependencies": {
     "@heroicons/react": "^1.0.6",
+    "@radix-ui/react-slot": "^1.1.0",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "embla-carousel-react": "^8.1.5",
+    "lucide-react": "^0.395.0",
     "next": "^14.2.4",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.23.1",
+    "react-slick": "^0.30.2",
+    "router": "^1.3.8",
+    "slick-carousel": "^1.8.1",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@types/node": "^20.14.4",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18",
+    "@types/react-slick": "^0.23.13",
     "autoprefixer": "^10.4.19",
     "eslint": "^8",
     "eslint-config-next": "14.2.4",
