@@ -1,7 +1,6 @@
 "use client";
-import HomePage from "@/app/components/home/page";
-import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 
 interface Event {
   id: number;
@@ -20,21 +19,23 @@ interface Session {
   end_time: number;
   new_description: string;
 }
-interface Ticket{
+
+interface Ticket {
   id: number;
-  ticket_name:string;
+  session_id: number;
+  ticket_name: string;
 }
 
 const EventDetails = () => {
   const [event, setEvent] = useState<Event | null>(null);
   const [sessions, setSessions] = useState<Session[]>([]);
-  const [tickets, setTicket] = useState<Ticket[]>([]);
-
+  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [selectedSessionId, setSelectedSessionId] = useState<number | null>(
+    null
+  );
   const { id } = useParams();
 
   useEffect(() => {
-    if (!id) return;
-
     const fetchEvent = async () => {
       try {
         const response = await fetch(`http://localhost:3001/allevents/${id}`);
@@ -42,7 +43,7 @@ const EventDetails = () => {
           throw new Error("Failed to fetch event");
         }
         const data: Event = await response.json();
-        console.log("Fetched event data:", data);
+        console.log("Event fetched:", data);
         setEvent(data);
       } catch (error) {
         console.error("Error fetching event:", error);
@@ -58,53 +59,61 @@ const EventDetails = () => {
           throw new Error("Failed to fetch sessions");
         }
         const data: Session[] = await response.json();
-        console.log("Fetched sessions data:", data);
+        console.log("Sessions fetched:", data);
         setSessions(data);
       } catch (error) {
         console.error("Error fetching sessions:", error);
       }
     };
+
+    if (id) {
+      fetchEvent();
+      fetchSessions();
+    }
+  }, [id]);
+
+  useEffect(() => {
     const fetchTickets = async () => {
-      try {
-        const response = await fetch(
-          `http://localhost:3000/ticket?session_id={sessionId}`
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch sessions");
+      if (selectedSessionId !== null) {
+        try {
+          const response = await fetch(
+            `http://localhost:3001/ticket?session_id=${selectedSessionId}`
+          );
+          if (!response.ok) {
+            throw new Error("Failed to fetch tickets");
+          }
+          const data: Ticket[] = await response.json();
+          console.log("Tickets fetched:", data);
+          setTickets(data);
+        } catch (error) {
+          console.error("Error fetching tickets:", error);
+          setTickets([]); // Handle error by setting tickets to an empty array
         }
-        const data: Ticket[] = await response.json();
-        console.log("Fetched ticket data:", data);
-        setTicket(data);
-      } catch (error) {
-        console.error("Error fetching tickets:", error);
       }
     };
 
-    fetchEvent();
-    fetchSessions();
     fetchTickets();
-  }, [id]);
+  }, [selectedSessionId]);
+
+  const handleSessionClick = (sessionId: number) => {
+    setSelectedSessionId(sessionId);
+  };
 
   if (!event) {
-    return <div>Loading...</div>;
+    return <div>Loading event...</div>;
   }
 
   return (
-    <>
-    {/* <div className="bg-white">
-    <HomePage/>
-    </div> */}
     <div className="container mx-auto">
       <div className="w-full flex">
         <div className="w-8/12 p-8">
           <div className="rounded-lg h-64 overflow-hidden">
             <img
-              alt="content"
+              alt="Event"
               className="object-cover object-center h-full w-full"
               src={event.event_image}
             />
           </div>
-
           <div className="text-white">{event.event_name}</div>
           <div className="text-white">{event.starting_price}</div>
           <div className="text-white">{event.start_date}</div>
@@ -112,48 +121,52 @@ const EventDetails = () => {
             <h1 className="items-center text-xl font-extrabold dark:text-white">
               About Event
             </h1>
-
-            <p className="text-sm ">{event.event_description}</p>
-            
+            <p className="text-sm">{event.event_description}</p>
           </div>
         </div>
         <div className="w-5/12 p-8">
-          <form className="max-w-sm mx-auto bg-white p-8 rounded">
-          <h1 className="items-center text-xl font-extrabold dark:text-white">
+          <div className="max-w-sm mx-auto bg-white p-8 rounded">
+            <h1 className="items-center text-xl font-extrabold dark:text-white">
               Sessions
             </h1>
             <ul className="text-sm text-gray-700 dark:text-white">
               {sessions.map((session) => (
-                <div key={session.id} className=" bg-gray-800 p-4 rounded-md my-2 text-white">
+                <div
+                  key={session.id}
+                  className="bg-gray-800 p-4 rounded-md my-2 text-white"
+                >
                   <div className="flex justify-between">
-                  <div>{session.session}</div>
-                  <div>
-                    {session.start_time} - {session.end_time}
+                    <div>{session.session}</div>
+                    <div>
+                      {session.start_time} - {session.end_time}
+                    </div>
                   </div>
-                  </div>
-                  <div>
-                    {session.new_description}
-                    <h1 className="items-center text-xl font-extrabold dark:text-white">
-              Tickets
-            </h1>
-            {tickets.map((tickets) => (
-              <div>{tickets.ticket_name}</div>
+                  <div>{session.new_description}</div>
+                  <button
+                    onClick={() => handleSessionClick(session.id)}
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-2"
+                  >
+                    View Tickets
+                  </button>
 
-              
-            ))}
-                  </div>
-                  
+                  {selectedSessionId === session.id && (
+                    <div>
+                      <h1 className="items-center text-xl font-extrabold dark:text-white">
+                        Tickets
+                      </h1>
+                      {(
+                        tickets.map((ticket) => <div>{ticket.ticket_name}</div>)
+                      )}
+                    </div>
+                  )}
                 </div>
               ))}
             </ul>
-            
-          </form>
+          </div>
         </div>
       </div>
     </div>
-    </>
   );
 };
-
 
 export default EventDetails;
