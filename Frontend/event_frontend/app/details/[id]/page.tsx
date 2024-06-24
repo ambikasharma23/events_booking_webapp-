@@ -154,8 +154,10 @@ const EventDetails = () => {
                       <h1 className="items-center text-xl font-extrabold dark:text-white">
                         Tickets
                       </h1>
-                      {(
+                      {tickets.length > 0 ? (
                         tickets.map((ticket) => <div>{ticket.ticket_name}</div>)
+                      ) : (
+                        <p>No tickets available for this session.</p>
                       )}
                     </div>
                   )}
