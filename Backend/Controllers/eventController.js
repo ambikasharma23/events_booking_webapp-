@@ -50,7 +50,7 @@ const Ticket = db.ticket;
 
 const getEvents = async (req, res) => {
   try {
-    const { id, event_name, category_id, search, event_category } = req.query;
+    const { id, event_name, category_id, search, event_category, limit, offset } = req.query;
 
     // Define the common query options
     const queryOptions = {
@@ -74,6 +74,8 @@ const getEvents = async (req, res) => {
       res.status(200).send(result);
     } else if (category_id) {
       queryOptions.where = { category_id };
+      queryOptions.limit = parseInt(limit);   // Apply limit if provided
+      queryOptions.offset = parseInt(offset); // Apply offset if provided
       const results = await Event.findAll(queryOptions);
       res.status(200).send(results);
     } else if (event_category) {
@@ -84,6 +86,8 @@ const getEvents = async (req, res) => {
           name: event_category,
         },
       });
+      queryOptions.limit = parseInt(limit);   // Apply limit if provided
+      queryOptions.offset = parseInt(offset); // Apply offset if provided
       const results = await Event.findAll(queryOptions);
       res.status(200).send(results);
     } else if (search) {
@@ -93,9 +97,14 @@ const getEvents = async (req, res) => {
           { event_description: { [Op.like]: `%${search}%` } },
         ],
       };
+      queryOptions.limit = parseInt(limit);   // Apply limit if provided
+      queryOptions.offset = parseInt(offset); // Apply offset if provided
       const results = await Event.findAll(queryOptions);
       res.status(200).send(results);
     } else {
+      // Fetch all events if no specific query parameters are provided
+      queryOptions.limit = parseInt(limit);   // Apply limit if provided
+      queryOptions.offset = parseInt(offset); // Apply offset if provided
       const results = await Event.findAll(queryOptions);
       res.status(200).send(results);
     }
