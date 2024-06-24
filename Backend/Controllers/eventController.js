@@ -50,7 +50,7 @@ const Ticket = db.ticket;
 
 const getEvents = async (req, res) => {
   try {
-    const { id, event_name, category_id, search, event_category } = req.query;
+    const { id, event_name, category_id, search, event_category, limit, offset } = req.query;
 
     // Define the common query options
     const queryOptions = {
@@ -67,25 +67,35 @@ const getEvents = async (req, res) => {
     if (id) {
       queryOptions.where = { id };
       const result = await Event.findOne(queryOptions);
-      res.status(200).send(result);
+      return res.status(200).send(result);
     } else if (event_name) {
       queryOptions.where = { event_name };
       const result = await Event.findOne(queryOptions);
-      res.status(200).send(result);
+      return res.status(200).send(result);
     } else if (category_id) {
       queryOptions.where = { category_id };
+      if (limit && !isNaN(parseInt(limit, 10))) {
+        queryOptions.limit = parseInt(limit, 10);   // Apply limit if provided and valid
+      }
+      if (offset && !isNaN(parseInt(offset, 10))) {
+        queryOptions.offset = parseInt(offset, 10); // Apply offset if provided and valid
+      }
       const results = await Event.findAll(queryOptions);
-      res.status(200).send(results);
+      return res.status(200).send(results);
     } else if (event_category) {
       queryOptions.include.push({
         model: Category,
         as: "category",
-        where: {
-          name: event_category,
-        },
+        where: { name: event_category },
       });
+      if (limit && !isNaN(parseInt(limit, 10))) {
+        queryOptions.limit = parseInt(limit, 10);   // Apply limit if provided and valid
+      }
+      if (offset && !isNaN(parseInt(offset, 10))) {
+        queryOptions.offset = parseInt(offset, 10); // Apply offset if provided and valid
+      }
       const results = await Event.findAll(queryOptions);
-      res.status(200).send(results);
+      return res.status(200).send(results);
     } else if (search) {
       queryOptions.where = {
         [Op.or]: [
@@ -93,15 +103,29 @@ const getEvents = async (req, res) => {
           { event_description: { [Op.like]: `%${search}%` } },
         ],
       };
+      if (limit && !isNaN(parseInt(limit, 10))) {
+        queryOptions.limit = parseInt(limit, 10);   // Apply limit if provided and valid
+      }
+      if (offset && !isNaN(parseInt(offset, 10))) {
+        queryOptions.offset = parseInt(offset, 10); // Apply offset if provided and valid
+      }
       const results = await Event.findAll(queryOptions);
-      res.status(200).send(results);
+      return res.status(200).send(results);
     } else {
+      // Fetch all events if no specific query parameters are provided
+      // Default limit and offset to undefined if not provided
+      if (limit && !isNaN(parseInt(limit, 10))) {
+        queryOptions.limit = parseInt(limit, 10);
+      }
+      if (offset && !isNaN(parseInt(offset, 10))) {
+        queryOptions.offset = parseInt(offset, 10);
+      }
       const results = await Event.findAll(queryOptions);
-      res.status(200).send(results);
+      return res.status(200).send(results);
     }
   } catch (error) {
     console.error("Error handling request:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
