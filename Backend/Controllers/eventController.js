@@ -5,6 +5,7 @@ const City = db.City;
 const Session = db.session;
 const Category = db.event_category;
 const moment = require("moment");
+const Ticket = db.ticket;
 
 // const filterEvents = (events, eventExceptions) => {
 //   const currentDate = new Date();
@@ -155,18 +156,31 @@ const getTodayEvent = async (req, res) => {
   try {
     const today = new Date();
     const formattedDate = moment(today).format("YYYY-MM-DD");
+
     const results = await Event.findAll({
-      where: {
-        start_date: formattedDate,
+      include: {
+        model: Session,
+        as: 'session', // Specify the alias here
+        required: true, // Ensures only Events with Sessions are included
+        include: {
+          model: Ticket,
+          as: 'ticket', // Specify the alias here
+          where: {
+            ticket_date: {
+              [Op.eq]: formattedDate,
+            },
+          },
+          required: true, // Ensures only Sessions with Tickets are included
+        },
       },
     });
+
     res.status(200).send(results);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Error while fetching sessions" });
+    res.status(500).json({ error: "Error while fetching events" });
   }
 };
-
 const getEventsbyId = async (req, res) => {
   let id = req.params.id;
   let event = await Event.findOne({
