@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 
 interface DanceCat {
   id: number;
@@ -48,41 +48,45 @@ export default function Dance() {
           slidesToShow: 3,
           slidesToScroll: 1,
           infinite: true,
-          dots: true
-        }
+          dots: true,
+        },
       },
       {
         breakpoint: 600,
         settings: {
           slidesToShow: 2,
           slidesToScroll: 2,
-          initialSlide: 2
-        }
+          initialSlide: 2,
+        },
       },
       {
         breakpoint: 480,
         settings: {
           slidesToShow: 2,
-          slidesToScroll: 1
-        }
-      }
-    ]
+          slidesToScroll: 1,
+        },
+      },
+    ],
   };
   const handleClick = (id: number) => {
     router.push(`/details/${id}`);
-};
+  };
 
   return (
     <>
-      <h1 className="text-white mx-20 my-1 font-bold p-5">Dance Shows</h1>
-
+      <div className="flex justify-between items-center p-5">
+        <h1 className="text-white font-bold">Dance Shows</h1>
+        <p className="text-white cursor-pointer">View All</p>
+      </div>
       <section className="text-gray-100 body-font">
         <div className="container mx-auto">
-
           <Slider {...settings}>
-
             {events.map((event) => (
-              <div className="p-1 md:p-1 w-full cursor-pointer" key={event.id} onClick={() => handleClick(event.id)}>
+              <div
+                className="p-1 md:p-1 w-full cursor-pointer"
+                key={event.id}
+                onClick={() => handleClick(event.id)}
+              >
                 <div className="h-full border-2 border-gray-200 border-opacity-10 rounded-lg overflow-hidden">
                   <img
                     className="h-28 md:h-40 w-full object-cover object-center"
@@ -95,7 +99,6 @@ export default function Dance() {
                 </h4>
               </div>
             ))}
-            
           </Slider>
         </div>
       </section>
