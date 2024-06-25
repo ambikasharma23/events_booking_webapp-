@@ -5,7 +5,7 @@ import Comedy from './components/home/comedy';
 import Dance from './components/home/dance';
 import Footer from './components/footer';
 import Today from './components/home/today';
-
+import EventExplorer from './components/home/allevents';
 
 export default function Home() {
   return (
@@ -16,6 +16,7 @@ export default function Home() {
       <Comedy />
       <Dance />
     <Today />
+    <EventExplorer />
       <Footer />     
     </main>
   );
