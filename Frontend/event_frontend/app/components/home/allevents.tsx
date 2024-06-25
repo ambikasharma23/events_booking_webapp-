@@ -5,6 +5,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { format } from 'date-fns';
 import { useRouter } from "next/navigation";
+import Tags from "../tags";
 
 interface Allevents {
   id: number;
