@@ -1,0 +1,31 @@
+/* styles/slick-slider.css */
+.slick-prev,
+.slick-next {
+  z-index: 10;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  color: white;
+  border: none;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.slick-prev:hover,
+.slick-next:hover {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.slick-prev {
+  left: 10px;
+  color: #ffffff; /* Change color of the arrows */
+}
+
+.slick-next {
+  right: 10px;
+  color: #ffffff; /* Change color of the arrows */
+}

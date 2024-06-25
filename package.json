@@ -5,6 +5,7 @@
     "@heroicons/react": "^2.1.4",
     "@mui/icons-material": "^5.15.20",
     "@mui/material": "^5.15.20",
+    "date-fns": "^3.6.0",
     "jsonwebtoken": "^9.0.2",
     "styled-components": "^6.1.11"
   }
