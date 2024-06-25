@@ -1,5 +1,5 @@
 "use client";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import HomePage from "../../components/home/page";
 import Slider from "react-slick";
@@ -20,6 +20,7 @@ interface Event {
 const Events = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const { id } = useParams();
+  const router = useRouter();
   const [categoryIcon, setCategoryIcon] = useState<string | null>(null);
   const [categoryName, setCategoryName] = useState<string>("");
 
@@ -97,6 +98,10 @@ const Events = () => {
     ],
   };
 
+  const handleEventClick = (eventId: number) => {
+    router.push(`/details/${eventId}`);
+  };
+
   return (
     <div>
       <div className="fixed top-0 left-0 right-0 z-50">
@@ -116,7 +121,7 @@ const Events = () => {
           {events.length > 0 ? (
             <Slider {...sliderSettings}>
               {events.map((event) => (
-                <div key={event.id}>
+                <div key={event.id} onClick={() => handleEventClick(event.id)} className="cursor-pointer">
                   <div className="bg-black rounded-lg shadow-md p-6">
                     {event.event_image && (
                       <img
