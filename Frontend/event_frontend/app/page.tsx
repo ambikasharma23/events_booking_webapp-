@@ -3,7 +3,7 @@ import Image from './components/home/banner'
 import Music from './components/home/music';
 import Comedy from './components/home/comedy';
 import Dance from './components/home/dance';
-import Today from './components/home/today';
+import Footer from './components/footer';
 
 
 export default function Home() {
@@ -14,8 +14,7 @@ export default function Home() {
       <Music />
       <Comedy />
       <Dance />
-      <Today />
-     
+      <Footer />     
     </main>
   );
 }
