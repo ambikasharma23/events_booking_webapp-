@@ -1,4 +1,4 @@
-"use client";
+"use client"
 import React, { useEffect, useState } from "react";
 import TicketQuantity from "@/app/components/ticketquantity";
 import Slider from "react-slick";
@@ -186,45 +186,48 @@ const EventDetails = () => {
 
   return (
     <>
-    <HomePage />
-    
-    <div className="container mx-auto">
-      <div className="w-full flex">
-        <div className="w-8/12 p-8">
-          <div className="rounded-lg h-64 overflow-hidden">
-            <img
-              alt="Event"
-              className="object-cover object-center h-full w-full"
-              src={event.event_image}
-            />
-          </div>
+      <HomePage />
+      <div className="container mx-auto  pt-12">
+        <div className="w-full flex flex-col lg:flex-row">
+          <div className="w-full lg:w-8/12 md:p-8 md:mt-1 mt-12" >
+            <div className="rounded-lg h-64 overflow-hidden">
+              <img
+                alt="Event"
+                className="object-cover object-center h-full w-full"
+                src={event.event_image}
+              />
+            </div>
 
-          <div className="bg-white rounded-md p-6">
-            <div>{event.event_name}</div>
-            <div>{event.starting_price}</div>
-            <div>{event.start_date}</div>
-            <h1 className="items-center text-xl font-extrabold dark:text-white">
-              About Event
-            </h1>
-            <p className="text-sm">{event.event_description}</p>
-          </div>
-          <div className="bg-white mt-4 rounded-sm">
-            <h1 className="items-center text-xl font-extrabold p-6">
-              Highlights
-            </h1>
-            <Slider {...settings}>
-              {gallery.map((galleryItem) => (
-                <div key={galleryItem.id} className="p-2">
-                  <div className="rounded-lg overflow-hidden">
-                    <img className="h-36" src={galleryItem.path} alt="Gallery Image" />
+            <div className="bg-white rounded-md p-3 md:p-6">
+              <div>{event.event_name}</div>
+              <div>{event.starting_price}</div>
+              <div>{event.start_date}</div>
+              <h1 className="items-center text-xl font-extrabold dark:text-white">
+                About Event
+              </h1>
+              <p className="text-sm">{event.event_description}</p>
+            </div>
+            <div className="bg-white mt-4 rounded-sm">
+              <h1 className="items-center text-xl font-extrabold p-6">
+                Highlights
+              </h1>
+              <Slider {...settings}>
+                {gallery.map((galleryItem) => (
+                  <div key={galleryItem.id} className="p-2">
+                    <div className="rounded-lg overflow-hidden">
+                      <img
+                        className=" w-full h-48 md:h-36"
+                        src={galleryItem.path}
+                        alt="Gallery Image"
+                      />
+                    </div>
                   </div>
-                </div>
-              ))}
-            </Slider>
+                ))}
+              </Slider>
+            </div>
           </div>
-        </div>
-        <div className="w-5/12 p-8">
-          <div className="max-w-sm mx-auto bg-white p-8 rounded">
+          <div className="w-full lg:w-5/12 pt-8 relative">
+            <div className="max-w-sm mx-auto bg-white p-2 rounded">
             <h1 className="items-center text-xl font-extrabold dark:text-white">
               Sessions
             </h1>
@@ -235,7 +238,7 @@ const EventDetails = () => {
                   className="bg-gray-800 p-4 rounded-md my-2 text-white"
                 >
                   <div className="flex justify-between">
-                    <div>{session.session}</div>
+                    <div className="text-yellow-500 font-bold">{session.session}</div>
                     <div>
                       {session.start_time} - {session.end_time}
                     </div>
@@ -252,20 +255,20 @@ const EventDetails = () => {
 
                   {openSessions.includes(session.id) && (
                     <div>
-                      <h1 className="items-center text-xl font-extrabold dark:text-white">
-                        Tickets
-                      </h1>
+                     
                       {ticketsBySession[session.id] &&
                       ticketsBySession[session.id].length > 0 ? (
                         ticketsBySession[session.id].map((ticket) => (
                           <div key={ticket.id}>
+                            <div className="py-2">
                             <div className="flex justify-between">
-                              <div>{ticket.ticket_name}</div>
+                              <div className="text-orange-400 font-bold">{ticket.ticket_name}</div>
                               <div>{ticket.ticket_date}</div>
-                            </div>
+                              </div>
                             <div className="flex justify-between">
-                              ₹{ticket.display_price}
+                             Valid for 1 person | ₹{ticket.display_price}
                               <TicketQuantity ticket={ticket} />
+                            </div>
                             </div>
                           </div>
                         ))
@@ -278,7 +281,7 @@ const EventDetails = () => {
               ))}
             </ul>
           </div>
-        </div>
+          <div className="bg-red-600 text-white rounded-sm p-4 mt-1 text-center mx-1">Book Now</div>        </div>
       </div>
       <Footer />
     </div>

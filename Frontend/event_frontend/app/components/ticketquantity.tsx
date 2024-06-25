@@ -36,7 +36,7 @@ const TicketQuantity: React.FC<TicketQuantityProps> = ({ ticket }) => {
       {quantity === null ? (
         <button
           onClick={increment}
-          className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 rounded"
+          className="bg-green-500 hover:bg-green-700 text-white font-bold px-2 rounded"
         >
           Add
         </button>
@@ -44,14 +44,14 @@ const TicketQuantity: React.FC<TicketQuantityProps> = ({ ticket }) => {
         <>
           <button
             onClick={decrement}
-            className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded-l"
+            className="bg-red-500 hover:bg-red-700 text-white font-bold px-2 rounded-l"
           >
             -
           </button>
           <span className="mx-2">{quantity}</span>
           <button
             onClick={increment}
-            className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 rounded-r"
+            className="bg-green-500 hover:bg-green-700 text-white font-bold px-2 rounded-r"
           >
             +
           </button>
