@@ -15,7 +15,7 @@ export default function Category() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        let response = await fetch("http://localhost:3001/getCategory");
+        let response = await fetch("http://localhost:3001/getCategory?limit=8&offset=0");
         if (!response.ok) {
           throw new Error("Failed to fetch data");
         }

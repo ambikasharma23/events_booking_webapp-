@@ -3,6 +3,8 @@ const Category = db.event_category;
 
 const getCategory = async (req, res) => {
   try {
+    const { limit, offset } = req.query;
+
     if (req.params.id) {
       const categoryId = req.params.id;
       const category = await Category.findByPk(categoryId);
@@ -11,7 +13,17 @@ const getCategory = async (req, res) => {
       }
       res.status(200).json(category);
     } else {
-      const results = await Category.findAll();
+      const queryOptions = {};
+
+      // Apply limit and offset if provided
+      if (limit && !isNaN(parseInt(limit, 10))) {
+        queryOptions.limit = parseInt(limit, 10);
+      }
+      if (offset && !isNaN(parseInt(offset, 10))) {
+        queryOptions.offset = parseInt(offset, 10);
+      }
+
+      const results = await Category.findAll(queryOptions);
       res.status(200).json(results);
     }
   } catch (err) {
@@ -19,6 +31,7 @@ const getCategory = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
 
 const createCategory = async (req, res) => {
   try {
