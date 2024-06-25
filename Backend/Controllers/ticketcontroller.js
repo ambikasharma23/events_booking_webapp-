@@ -9,7 +9,7 @@ const getTicket = async (req, res) => {
     const sessionId = req.query.session_id;
     let results;
     if (sessionId) {
-      results = await Ticket.findOne({ where: { session_id: sessionId } });
+      results = await Ticket.findAll({ where: { session_id: sessionId } });
     }
     res.status(200).send(results);
   } catch (error) {
@@ -21,7 +21,14 @@ const getTicket = async (req, res) => {
 //Exception applied on tickets on the basis of session_id
 const createTicket = async (req, res) => {
   try {
-    const {session_id, ticket_name, cost, actual_price, display_price, capacity } = req.body;
+    const {
+      session_id,
+      ticket_name,
+      cost,
+      actual_price,
+      display_price,
+      capacity,
+    } = req.body;
     const session = await Session.findOne({
       where: { id: session_id },
       include: [{ model: Event, as: "events" }],
@@ -41,7 +48,7 @@ const createTicket = async (req, res) => {
       where: { session_id },
       attributes: ["start_date", "end_date"],
     });
-//When end date is given range of dates need to be stored
+    //When end date is given range of dates need to be stored
     const exceptionRanges = exceptions.map((ex) => ({
       ExStart: new Date(ex.start_date),
       ExEnd: ex.end_date ? new Date(ex.end_date) : new Date(ex.start_date),
@@ -51,7 +58,9 @@ const createTicket = async (req, res) => {
 
     let d = new Date(eventStart);
     while (!eventEnd || d <= eventEnd) {
-      const isException = exceptionRanges.some((range) => d >= range.ExStart && d <= range.ExEnd);
+      const isException = exceptionRanges.some(
+        (range) => d >= range.ExStart && d <= range.ExEnd
+      );
       if (!isException) {
         ticketData.push({
           session_id,
