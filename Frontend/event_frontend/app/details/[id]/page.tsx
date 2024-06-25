@@ -235,7 +235,7 @@ const EventDetails = () => {
 
           </div>
           <div className="w-full lg:w-5/12 pt-8">
-            <div className="max-w-sm mx-auto bg-white p-2 rounded">
+            <div className="max-w-3xl mx-auto bg-white p-2 rounded">
             <h1 className="items-center text-xl font-extrabold dark:text-white">
               Sessions
             </h1>
