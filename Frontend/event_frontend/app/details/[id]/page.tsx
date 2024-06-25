@@ -7,6 +7,8 @@ import "slick-carousel/slick/slick-theme.css";
 import { useParams } from "next/navigation";
 import Footer from "@/app/components/footer";
 import HomePage from "@/app/components/home/page";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCalendar } from '@fortawesome/free-solid-svg-icons';
 
 interface Event {
   id: number;
@@ -199,34 +201,40 @@ const EventDetails = () => {
             </div>
 
             <div className="bg-white rounded-md p-3 md:p-6">
-              <div>{event.event_name}</div>
-              <div>{event.starting_price}</div>
-              <div>{event.start_date}</div>
-              <h1 className="items-center text-xl font-extrabold dark:text-white">
+              <div className="font-extrabold flex justify-between">{event.event_name}
+              <div className="text-rose-600	">₹{event.starting_price} Onwards</div>
+
+              </div>
+              <div className="text-sm">
+              <FontAwesomeIcon icon={faCalendar}/> {event.start_date}</div>
+              <h1 className="items-center text-xl font-extrabold dark:text-white mt-4">
                 About Event
               </h1>
-              <p className="text-sm">{event.event_description}</p>
+              <p className="text-sm bg-zinc-100	p-3">{event.event_description}</p>
             </div>
             <div className="bg-white mt-4 rounded-sm">
-              <h1 className="items-center text-xl font-extrabold p-6">
-                Highlights
-              </h1>
-              <Slider {...settings}>
-                {gallery.map((galleryItem) => (
-                  <div key={galleryItem.id} className="p-2">
-                    <div className="rounded-lg overflow-hidden">
-                      <img
-                        className=" w-full h-48 md:h-36"
-                        src={galleryItem.path}
-                        alt="Gallery Image"
-                      />
-                    </div>
-                  </div>
-                ))}
-              </Slider>
-            </div>
+  <h1 className="items-center text-xl font-extrabold p-6">Highlights</h1>
+  {gallery.length > 0 ? (
+    <Slider {...settings}>
+      {gallery.map((galleryItem) => (
+        <div key={galleryItem.id} className="p-2 mb-4">
+          <div className="rounded-lg overflow-hidden">
+            <img
+              className="w-full h-48 md:h-36"
+              src={galleryItem.path}
+              alt="Gallery Image"
+            />
           </div>
-          <div className="w-full lg:w-5/12 pt-8 relative">
+        </div>
+      ))}
+    </Slider>
+  ) : (
+    <p className="text-center p-6">No highlights available.</p>
+  )}
+</div>
+
+          </div>
+          <div className="w-full lg:w-5/12 pt-8">
             <div className="max-w-sm mx-auto bg-white p-2 rounded">
             <h1 className="items-center text-xl font-extrabold dark:text-white">
               Sessions
@@ -281,7 +289,7 @@ const EventDetails = () => {
               ))}
             </ul>
           </div>
-          <div className="bg-red-600 text-white rounded-sm p-4 mt-1 text-center mx-1">Book Now</div>        </div>
+          <div className="bg-red-600 text-white rounded-sm p-4 mt-1 text-center mx-2">Book Now</div>        </div>
       </div>
       <Footer />
     </div>
