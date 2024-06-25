@@ -4,6 +4,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useRouter } from "next/navigation";
+import Tags from "../tags";
 
 interface AllEvents {
   id: number;
@@ -99,8 +100,8 @@ export default function EventExplorer() {
     <>
       <div className="flex justify-between items-center p-5">
         <h1 className="text-white font-bold">Explore All Events</h1>
-        <p className="text-white cursor-pointer">View All</p>
       </div>
+      <Tags />
       <section className="text-gray-100 body-font">
         <div className="container mx-auto">
           <Slider {...settings}>
