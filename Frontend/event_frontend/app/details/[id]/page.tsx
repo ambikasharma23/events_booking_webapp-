@@ -235,7 +235,7 @@ const EventDetails = () => {
 
           </div>
           <div className="w-full lg:w-5/12 pt-8">
-            <div className="max-w-3xl mx-auto bg-white p-2 rounded">
+            <div className="max-w-sm mx-auto bg-white p-2 rounded">
             <h1 className="items-center text-xl font-extrabold dark:text-white">
               Sessions
             </h1>
@@ -287,6 +287,18 @@ const EventDetails = () => {
                   )}
                 </div>
               ))}
+              <form>
+              <div className="grid gap-6 mb-6 md:grid-cols-2">
+              <div>
+            <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>
+            <input type="text" id="company" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Enter Your Name" required />
+        </div>
+        <div>
+            <label  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Phone number</label>
+            <input type="tel" id="phone" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="123-45-678" pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}" required />
+        </div>
+                </div>
+                </form>
             </ul>
           </div>
           <div className="bg-red-600 text-white rounded-sm p-4 mt-1 text-center mx-2">Book Now</div>        </div>
