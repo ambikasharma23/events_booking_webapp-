@@ -7,6 +7,7 @@ interface TagsProps {
   setSelectedOption: (option: string | null) => void;
   toggleDropdown: () => void;
   handleOptionClick: (option: string) => void;
+  resetSelection: () => void; // Add resetSelection function
   showDropdown: boolean;
 }
 
@@ -15,12 +16,9 @@ const Tags: React.FC<TagsProps> = ({
   setSelectedOption,
   toggleDropdown,
   handleOptionClick,
+  resetSelection,
   showDropdown,
 }) => {
-
-  const resetSelection = () => {
-    setSelectedOption(null); // Reset selected option
-  };
 
   return (
     <div className="relative">
@@ -36,7 +34,7 @@ const Tags: React.FC<TagsProps> = ({
         {selectedOption && (
           <button
             className="ml-2 text-gray-500 hover:text-gray-600 focus:outline-none"
-            onClick={resetSelection}
+            onClick={resetSelection} // Call resetSelection on click
             aria-label="Clear selection"
           >
             <svg

@@ -1,4 +1,6 @@
-"use client";
+'use client';
+
+
 import React, { useEffect, useState } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
@@ -55,7 +57,14 @@ export default function EventExplorer() {
           case "Cost: high to low":
             url = "http://localhost:3001/Eventcost?sort=desc";
             break;
-          // Add other cases as needed
+          case "Distance: low to high":
+            url = "http://localhost:3001/Eventdistance?sort=asc";
+            break;
+          case "Date":
+            url = "http://localhost:3001/eventDate";
+            break;
+          default:
+            break;
         }
       }
       let response = await fetch(url);
@@ -74,6 +83,12 @@ export default function EventExplorer() {
     setSelectedOption(option);
     setShowDropdown(false);
     fetchData(option);
+  };
+
+  // Reset selected option and fetch all events
+  const resetSelection = () => {
+    setSelectedOption(null);
+    fetchData(); // Fetch all events
   };
 
   useEffect(() => {
@@ -115,9 +130,11 @@ export default function EventExplorer() {
       },
     ],
   };
+
   const handleClick = (id: number) => {
     router.push(`/details/${id}`);
   };
+
   return (
     <>
       <div className="flex justify-between items-center p-5">
@@ -128,6 +145,7 @@ export default function EventExplorer() {
         setSelectedOption={setSelectedOption}
         toggleDropdown={toggleDropdown}
         handleOptionClick={handleOptionClick}
+        resetSelection={resetSelection} // Pass resetSelection function
         showDropdown={showDropdown}
       />
       <section className="text-gray-100 body-font">
@@ -161,3 +179,4 @@ export default function EventExplorer() {
     </>
   );
 }
+
