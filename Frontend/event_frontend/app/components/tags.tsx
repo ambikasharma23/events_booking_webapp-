@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 
 interface TagsProps {
@@ -7,8 +5,9 @@ interface TagsProps {
   setSelectedOption: (option: string | null) => void;
   toggleDropdown: () => void;
   handleOptionClick: (option: string) => void;
-  resetSelection: () => void; // Add resetSelection function
+  resetSelection: () => void;
   showDropdown: boolean;
+  handleTagClick: (tag: string) => void; // Add handleTagClick prop
 }
 
 const Tags: React.FC<TagsProps> = ({
@@ -18,23 +17,24 @@ const Tags: React.FC<TagsProps> = ({
   handleOptionClick,
   resetSelection,
   showDropdown,
+  handleTagClick, // Destructure handleTagClick
 }) => {
-
   return (
     <div className="relative">
+      {/* Sorting dropdown button */}
       <button
         id="dropdownHoverButton"
         data-dropdown-toggle="dropdownHover"
         data-dropdown-trigger="hover"
         onClick={toggleDropdown}
-        className={`text-white ${selectedOption ? 'bg-yellow-500' : 'bg-gray-400 hover:bg-gray-500'} focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-blue-800`}
+        className={`text-white ${selectedOption ? 'bg-yellow-500' : 'bg-gray-400 hover:bg-gray-500'} focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-2 text-center inline-flex items-center dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-blue-800`}
         type="button"
       >
         {selectedOption || 'Sort'}{' '}
         {selectedOption && (
           <button
             className="ml-2 text-gray-500 hover:text-gray-600 focus:outline-none"
-            onClick={resetSelection} // Call resetSelection on click
+            onClick={resetSelection}
             aria-label="Clear selection"
           >
             <svg
@@ -72,6 +72,18 @@ const Tags: React.FC<TagsProps> = ({
           </svg>
         )}
       </button>
+
+      {/* Tag buttons */}
+      {['under 10 Km', 'DJ', 'Live music', 'Nightlife & clubbing', 'comedy', 'Party'].map(tag => (
+        <button
+          key={tag}
+          className="text-white bg-gray-400 hover:bg-gray-500 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-blue-800 ml-2"
+          onClick={() => handleTagClick(tag)}
+          type="button"
+        >
+          {tag}
+        </button>
+      ))}
 
       {/* Dropdown menu */}
       {showDropdown && (
