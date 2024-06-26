@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useEffect, useState } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
@@ -54,6 +54,9 @@ const EventDetails = () => {
     ticketId: -1,
     numberOfPersons: 0,
   });
+  const [ticketQuantities, setTicketQuantities] = useState<{
+    [key: number]: number;
+  }>({});
   const { id } = useParams();
 
   useEffect(() => {
@@ -148,32 +151,61 @@ const EventDetails = () => {
   };
 
   const handleQuantityChange = (ticketId: number, quantity: number) => {
-    setBookingInfo((prevBookingInfo) => ({
-      ...prevBookingInfo,
-      ticketId,
-      numberOfPersons: quantity,
+    if (quantity < 0) {
+      // Prevent decrementing below 0
+      quantity = 0;
+    }
+    setTicketQuantities((prevTicketQuantities) => ({
+      ...prevTicketQuantities,
+      [ticketId]: quantity,
     }));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:3001/booking/insert", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: bookingInfo.name,
-          contact: bookingInfo.phoneNumber,
-          ticket_id: bookingInfo.ticketId,
-          no_of_persons: bookingInfo.numberOfPersons,
-        }),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to submit booking");
+      const selectedTickets = Object.keys(ticketQuantities).filter(
+        (ticketId) => ticketQuantities[parseInt(ticketId, 10)] > 0
+      );
+
+      if (selectedTickets.length === 0) {
+        throw new Error("Please select at least one ticket.");
       }
-      alert("Booking submitted successfully!");
+
+      const bookingPromises = selectedTickets.map(async (ticketIdStr) => {
+        const ticketId = parseInt(ticketIdStr, 10);
+        const response = await fetch("http://localhost:3001/booking/insert", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: bookingInfo.name,
+            contact: bookingInfo.phoneNumber,
+            ticket_id: ticketId,
+            no_of_persons: ticketQuantities[ticketId] || 1,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to submit booking for ticket ID ${ticketId}`);
+        }
+
+        return await response.json();
+      });
+
+      const results = await Promise.all(bookingPromises);
+      console.log("Booking results:", results);
+      alert("Bookings submitted successfully!");
+
+      // Reset bookingInfo and ticketQuantities state after successful submission
+      setBookingInfo({
+        name: "",
+        phoneNumber: "",
+        ticketId: -1,
+        numberOfPersons: 0,
+      });
+      setTicketQuantities({});
     } catch (error) {
       console.error("Error submitting booking:", error);
       alert("Error submitting booking. Please try again.");
@@ -305,23 +337,27 @@ const EventDetails = () => {
                         {session.session}
                       </div>
                       <div>
+                        {session.start_time}-{session.end_time}
+                      </div>
+                      </div>
+                      {session.new_description}
+                      <div>
                         <button
-                          className="bg-rose-700 text-white font-bold py-2 px-4 rounded"
+                          className="bg-sky-500	 text-white font-bold py-2 px-4 rounded mt-2 mb-2"
                           onClick={() => handleSessionClick(session.id)}
                         >
                           {openSessions.includes(session.id)
-                            ? "Close Details"
-                            : "View Details"}
+                            ? "Hide Tickets"
+                            : "View Tickets"}
                         </button>
-                      </div>
                     </div>
                     {openSessions.includes(session.id) && (
                       <div>
                         {ticketsBySession[session.id]?.map((ticket) => (
                           <div key={ticket.id} className="mb-4">
-                            <div className="flex justify-between items-center">
-                              <div>
-                                <div className="font-bold">
+                            <div>
+                              <div className="flex justify-between mb-1">
+                                <div className="font-bold text-orange-500">
                                   {ticket.ticket_name}
                                 </div>
                                 <div>
@@ -329,42 +365,42 @@ const EventDetails = () => {
                                     ticket.ticket_date
                                   ).toLocaleDateString()}
                                 </div>
-                                <div className="text-rose-600">
-                                  ₹{ticket.display_price}
                                 </div>
-                              </div>
+                                <div className="flex justify-between">
+
+                                <div className="text-white">
+                                  Valid for 1 person | ₹{ticket.display_price}
+                                </div>
                               <div className="flex items-center space-x-4">
                                 <button
-                                  className="text-xl text-gray-700 dark:text-white focus:outline-none"
+                                  className="text-xs text-white focus:outline-none bg-green-600 px-1 py-1 "
                                   onClick={() =>
                                     handleQuantityChange(
                                       ticket.id,
                                       Math.max(
-                                        1,
-                                        bookingInfo.numberOfPersons - 1
+                                        0,
+                                        ticketQuantities[ticket.id] - 1
                                       )
                                     )
                                   }
                                 >
                                   -
                                 </button>
-                                <span className="text-xl text-gray-700 dark:text-white">
-                                  {bookingInfo.ticketId === ticket.id &&
-                                  bookingInfo.numberOfPersons > 0
-                                    ? bookingInfo.numberOfPersons
-                                    : "Add"}
+                                <span className="text-xs text-white">
+                                  {ticketQuantities[ticket.id] || "Add"}
                                 </span>
                                 <button
-                                  className="text-xl text-gray-700 dark:text-white focus:outline-none"
+                                  className="text-xs text-white focus:outline-none bg-rose-600 px-1 py-1 "
                                   onClick={() =>
                                     handleQuantityChange(
                                       ticket.id,
-                                      bookingInfo.numberOfPersons + 1
+                                      (ticketQuantities[ticket.id] || 0) + 1
                                     )
                                   }
                                 >
                                   +
                                 </button>
+                              </div>
                               </div>
                             </div>
                           </div>
@@ -431,4 +467,3 @@ const EventDetails = () => {
 };
 
 export default EventDetails;
-
