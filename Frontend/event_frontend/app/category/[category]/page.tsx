@@ -95,6 +95,7 @@ export default function Comedy() {
   const handleClick = (id: number) => {
     router.push(`/details/${id}`);
   };
+
   return (
     <>
       <div className="flex justify-between items-center p-5">

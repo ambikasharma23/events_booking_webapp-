@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Footer from "@/app/components/footer";
 import HomePage from "@/app/components/home/page";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -41,6 +41,7 @@ interface Gallery {
 }
 
 const EventDetails = () => {
+  const [errorMessage, setErrorMessage] = useState("");
   const [event, setEvent] = useState<Event | null>(null);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [ticketsBySession, setTicketsBySession] = useState<{
@@ -58,6 +59,8 @@ const EventDetails = () => {
     [key: number]: number;
   }>({});
   const { id } = useParams();
+  const router = useRouter(); 
+
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -167,11 +170,12 @@ const EventDetails = () => {
       const selectedTickets = Object.keys(ticketQuantities).filter(
         (ticketId) => ticketQuantities[parseInt(ticketId, 10)] > 0
       );
-
+  
       if (selectedTickets.length === 0) {
-        throw new Error("Please select at least one ticket.");
+        setErrorMessage("Please select at least one ticket.");
+        return;
       }
-
+  
       const bookingPromises = selectedTickets.map(async (ticketIdStr) => {
         const ticketId = parseInt(ticketIdStr, 10);
         const response = await fetch("http://localhost:3001/booking/insert", {
@@ -186,19 +190,16 @@ const EventDetails = () => {
             no_of_persons: ticketQuantities[ticketId] || 1,
           }),
         });
-
+  
         if (!response.ok) {
           throw new Error(`Failed to submit booking for ticket ID ${ticketId}`);
         }
-
+  
         return await response.json();
       });
-
+  
       const results = await Promise.all(bookingPromises);
-      console.log("Booking results:", results);
-      alert("Bookings submitted successfully!");
-
-      // Reset bookingInfo and ticketQuantities state after successful submission
+      console.log("Booking results:", results);  
       setBookingInfo({
         name: "",
         phoneNumber: "",
@@ -206,11 +207,16 @@ const EventDetails = () => {
         numberOfPersons: 0,
       });
       setTicketQuantities({});
+      setErrorMessage(""); 
+
+      router.push("/confirm");
     } catch (error) {
       console.error("Error submitting booking:", error);
       alert("Error submitting booking. Please try again.");
     }
   };
+  
+
 
   if (!event) {
     return <div>Loading event...</div>;
@@ -236,6 +242,9 @@ const EventDetails = () => {
         onClick={onClick}
       />
     );
+  };
+  const areTicketsSelected = () => {
+    return Object.values(ticketQuantities).some(quantity => quantity > 0);
   };
 
   const settings = {
@@ -413,13 +422,14 @@ const EventDetails = () => {
             </div>
             <div className="max-w-sm mx-auto mt-6 bg-white p-2 rounded">
               <h1 className="items-center text-xl font-extrabold dark:text-white">
-                Booking Form
+                Enter Details
               </h1>
               <form onSubmit={handleSubmit} className="mt-4">
-                <div className="mb-4">
+                <div className="grid gap-6 mb-6 md:grid-cols-2">
+                <div>
                   <label
                     htmlFor="name"
-                    className="block text-gray-700 dark:text-white text-sm font-bold mb-2"
+                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                   >
                     Name
                   </label>
@@ -429,15 +439,14 @@ const EventDetails = () => {
                     name="name"
                     value={bookingInfo.name}
                     onChange={handleInputChange}
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    placeholder="Enter Your Name"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     required
                   />
                 </div>
-                <div className="mb-4">
+                <div>
                   <label
-                    htmlFor="phoneNumber"
-                    className="block text-gray-700 dark:text-white text-sm font-bold mb-2"
-                  >
+                    htmlFor="phoneNumber" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                     Phone Number
                   </label>
                   <input
@@ -446,15 +455,24 @@ const EventDetails = () => {
                     name="phoneNumber"
                     value={bookingInfo.phoneNumber}
                     onChange={handleInputChange}
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    placeholder="123-456-789"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     required
                   />
                 </div>
+                </div>
+                {errorMessage && (
+  <div className="text-red-600 font-bold mb-4">
+    {errorMessage}
+  </div>
+)}
+
                 <button
                   type="submit"
-                  className="bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 px-4 rounded"
+                  className="bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 px-4 rounded mt-4 w-full"
+                  disabled={!areTicketsSelected()} 
                 >
-                  Submit Booking
+                  Book Now
                 </button>
               </form>
             </div>

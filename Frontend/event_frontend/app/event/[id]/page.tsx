@@ -2,9 +2,7 @@
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import HomePage from "../../components/home/page";
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
+import { format } from 'date-fns';
 import Footer from "@/app/components/footer";
 
 interface Event {
@@ -16,9 +14,16 @@ interface Event {
   icon: string;
   event_image: string;
   event_name: string;
+  start_date: string;
 }
 
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return format(date, "do MMMM");
+};
+
 const Events = () => {
+  const [loading, setLoading] = useState(true); // Add a loading state
   const [events, setEvents] = useState<Event[]>([]);
   const { id } = useParams();
   const router = useRouter();
@@ -49,8 +54,10 @@ const Events = () => {
           }
           const eventData: Event[] = await eventsResponse.json();
           setEvents(eventData);
+          setLoading(false); // Set loading to false once data is fetched
         } catch (error) {
           console.error("Error fetching data:", error);
+          setLoading(false); // Set loading to false even if there's an error
         }
       };
 
@@ -62,92 +69,70 @@ const Events = () => {
     return <div>Loading...</div>;
   }
 
-  const sliderSettings = {
-    infinite: true,
-    slidesToShow: 4, // Display 4 slides at a time
-    slidesToScroll: 1,
-    centerMode: true,
-    centerPadding: "0",
-    focusOnSelect: true,
-    speed: 500,
-    adaptiveHeight: true,
-    responsive: [
-      {
-        breakpoint: 1024,
-        settings: {
-          slidesToShow: 1,
-          slidesToScroll: 1,
-          infinite: true,
-          dots: true,
-        },
-      },
-      {
-        breakpoint: 600,
-        settings: {
-          slidesToShow: 1,
-          slidesToScroll: 1,
-          initialSlide: 2,
-        },
-      },
-      {
-        breakpoint: 480,
-        settings: {
-          slidesToShow: 1,
-          slidesToScroll: 1,
-        },
-      },
-    ],
-  };
-
   const handleEventClick = (eventId: number) => {
     router.push(`/details/${eventId}`);
   };
 
+  const handleClick = (id: number) => {
+    router.push(`/details/${id}`);
+  };
+
   return (
-    <div>
-      <div className="fixed top-0 left-0 right-0 z-50">
-        <HomePage />
-      </div>
+    <>
+      <div>
+        <div className="fixed top-0 left-0 right-0 z-50">
+          <HomePage />
+        </div>
 
-      {categoryIcon && (
-        <div className="flex flex-col items-center justify-center mb-50 relative z-10">
-          <div className="w-full md:max-w-full h-40 bg-gradient-to-b from-gray-400 to-black flex items-center justify-center">
-            <span className="text-xl font-bold text-white">{categoryName}</span>
+        {categoryIcon && (
+          <div className="flex flex-col items-center justify-center mb-50 relative z-10">
+            <div className="w-full md:max-w-full h-40 bg-gradient-to-b flex items-center justify-center">
+              <span className="text-xl font-bold text-white">{categoryName}</span>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      <div className="mt-20 p-4 flex justify-center">
-        <div className="max-w-5xl w-full">
-          {events.length > 0 ? (
-            <Slider {...sliderSettings}>
-              {events.map((event) => (
-                <div key={event.id} onClick={() => handleEventClick(event.id)} className="cursor-pointer">
-                  <div className="bg-black rounded-lg shadow-md p-6">
-                    {event.event_image && (
-                      <img
-                        src={event.event_image}
-                        alt={event.event_name}
-                        className="w-full h-auto md:h-36 mb-4"
-                      />
-                    )}
-                    <h1 className="text-lg text-white font-bold">
-                      {event.event_name}
-                    </h1>
-                    <p className="text-gray-400">{event.date}</p>
-                    <p className="text-gray-400">{event.location}</p>
-                    <p className="text-gray-400">{event.description}</p>
+        <section className="text-gray-100 body-font">
+          <div className="container mx-auto">
+            {!loading && events.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {events.map((event) => (
+                  <div
+                    className="p-1 md:p-1 w-full cursor-pointer relative"
+                    key={event.id}
+                    onClick={() => handleClick(event.id)}
+                  >
+                    <div className="h-44 md:h-full border-2 border-gray-200 border-opacity-10 rounded-lg overflow-hidden">
+                      <div className="relative">
+                        <img
+                          className="h-44 md:h-40 w-full object-cover object-center"
+                          src={event.event_image}
+                          alt={event.event_name}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent"></div>
+                      </div>
+                      <div className="absolute bottom-0 w-full text-white p-4 ">
+                        <div>
+                          <h4 className="text-sm font-medium">{event.event_name}</h4>
+                        </div>
+                        <div className="flex justify-between">
+                          <div className="text-xs font-medium text-gray-400 mt-1">{formatDate(event.start_date)}</div>
+                          <button type="button" className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-red-300 font-medium rounded-sm text-xs p-1 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">Book Tickets</button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </Slider>
-          ) : (
-            <div className="text-center">No events found</div>
-          )}
-        </div>
+                ))}
+              </div>
+            ) : (
+              <p>Loading events...</p>
+            )}
+          </div>
+        </section>
       </div>
-      <Footer />
-    </div>
+      <Footer/>
+
+    </>
   );
 };
 
