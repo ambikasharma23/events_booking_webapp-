@@ -1,30 +1,22 @@
-import React, { useState } from 'react';
+'use client';
 
-const Tags: React.FC = () => {
-  const [selectedOption, setSelectedOption] = useState<string | null>(null); // State to store selected option
-  const [showDropdown, setShowDropdown] = useState(false); // State to control dropdown visibility
+import React from 'react';
 
-  const toggleDropdown = () => {
-    setShowDropdown(!showDropdown); // Toggle dropdown visibility
-  };
+interface TagsProps {
+  selectedOption: string | null;
+  setSelectedOption: (option: string | null) => void;
+  toggleDropdown: () => void;
+  handleOptionClick: (option: string) => void;
+  showDropdown: boolean;
+}
 
-  const handleOptionClick = async (option: string) => {
-    setSelectedOption(option); // Set the selected option
-    setShowDropdown(false); // Close the dropdown after selection
-
-    // Check if the clicked option is "Cost: low to high"
-    if (option === 'Cost: low to high') {
-      try {
-        // Perform the fetch operation
-        const response = await fetch('http://localhost:3001/Eventcost?sortasc');
-        // Handle response (optional)
-        console.log('Fetch response:', response);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        // Handle error (optional)
-      }
-    }
-  };
+const Tags: React.FC<TagsProps> = ({
+  selectedOption,
+  setSelectedOption,
+  toggleDropdown,
+  handleOptionClick,
+  showDropdown,
+}) => {
 
   const resetSelection = () => {
     setSelectedOption(null); // Reset selected option
@@ -90,14 +82,6 @@ const Tags: React.FC = () => {
           className="z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 absolute mt-2"
         >
           <ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownHoverButton">
-            {/* <li>
-              <button
-                className="block px-4 py-2 w-full text-left hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white focus:outline-none"
-                onClick={() => handleOptionClick('Popularity')}
-              >
-                Popularity
-              </button>
-            </li> */}
             <li>
               <button
                 className="block px-4 py-2 w-full text-left hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white focus:outline-none"

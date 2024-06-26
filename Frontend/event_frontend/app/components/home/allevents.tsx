@@ -3,55 +3,91 @@ import React, { useEffect, useState } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { format } from 'date-fns';
 import { useRouter } from "next/navigation";
 import Tags from "../tags";
 
-interface Allevents {
+interface AllEvents {
   id: number;
   event_image: string;
   event_name: string;
-  start_date: string;
 }
 
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return format(date, "do MMMM");
+const CustomPrevArrow = (props: any) => {
+  const { className, style, onClick } = props;
+  return (
+    <div
+      className={`${className} custom-prev-arrow`}
+      style={{ ...style, display: "block" }}
+      onClick={onClick}
+    />
+  );
+};
+
+const CustomNextArrow = (props: any) => {
+  const { className, style, onClick } = props;
+  return (
+    <div
+      className={`${className} custom-next-arrow`}
+      style={{ ...style, display: "block" }}
+      onClick={onClick}
+    />
+  );
 };
 
 export default function EventExplorer() {
-  const [events, setEvents] = useState<Allevents[]>([]);
-  const [loading, setLoading] = useState(true); // Add a loading state
+  const [events, setEvents] = useState<AllEvents[]>([]);
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [showDropdown, setShowDropdown] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        let response = await fetch(
-          "http://localhost:3001/allevents"
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch data");
-        }
-        const data: Allevents[] = await response.json();
-        console.log("Fetched data:", data);
-        setEvents(data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false); // Set loading to false after fetching data
-      }
-    };
+  const toggleDropdown = () => {
+    setShowDropdown(!showDropdown);
+  };
 
+  const fetchData = async (sortOption?: string) => {
+    try {
+      let url = "http://localhost:3001/allevents";
+      if (sortOption) {
+        switch (sortOption) {
+          case "Cost: low to high":
+            url = "http://localhost:3001/Eventcost?sort=asc";
+            break;
+          case "Cost: high to low":
+            url = "http://localhost:3001/Eventcost?sort=desc";
+            break;
+          // Add other cases as needed
+        }
+      }
+      let response = await fetch(url);
+      if (!response.ok) {
+        throw new Error("Failed to fetch data");
+      }
+      const data: AllEvents[] = await response.json();
+      console.log(data);
+      setEvents(data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const handleOptionClick = (option: string) => {
+    setSelectedOption(option);
+    setShowDropdown(false);
+    fetchData(option);
+  };
+
+  useEffect(() => {
     fetchData();
   }, []);
 
   const settings = {
     dots: true,
-    infinite: true,
+    infinite: false,
     speed: 500,
     slidesToShow: 5,
     slidesToScroll: 1,
+    prevArrow: <CustomPrevArrow />,
+    nextArrow: <CustomNextArrow />,
     responsive: [
       {
         breakpoint: 1024,
@@ -60,9 +96,6 @@ export default function EventExplorer() {
           slidesToScroll: 1,
           infinite: true,
           dots: true,
-          centerMode: true,
-          centerPadding: "10px",
-          initialSlide: 1,
         },
       },
       {
@@ -70,76 +103,59 @@ export default function EventExplorer() {
         settings: {
           slidesToShow: 2,
           slidesToScroll: 1,
-          centerMode: true,
-          centerPadding: "20px",
-          initialSlide: 1,
+          initialSlide: 2,
         },
       },
       {
         breakpoint: 480,
         settings: {
-          slidesToShow: 1,
+          slidesToShow: 2,
           slidesToScroll: 1,
-          centerMode: true,
-          centerPadding: "20px",
-          initialSlide: 1,
         },
       },
     ],
   };
-
   const handleClick = (id: number) => {
     router.push(`/details/${id}`);
   };
-
-  const handleViewAllClick = (category: string) => {
-    router.push(`/category/${category}`);
-  };
-
   return (
     <>
       <div className="flex justify-between items-center p-5">
-        <h1 className="text-white font-bold">All Events</h1>
-        <p className="text-white cursor-pointer" onClick={() => handleViewAllClick('dance')}>
-          View All
-        </p>
+        <h1 className="text-white font-bold">Explore All Events</h1>
       </div>
-
+      <Tags
+        selectedOption={selectedOption}
+        setSelectedOption={setSelectedOption}
+        toggleDropdown={toggleDropdown}
+        handleOptionClick={handleOptionClick}
+        showDropdown={showDropdown}
+      />
       <section className="text-gray-100 body-font">
         <div className="container mx-auto">
-          {!loading && events.length > 0 ? (
-            <Slider {...settings}>
-              {events.map((event) => (
-                <div
-                  className="p-1 md:p-1 w-full cursor-pointer relative"
-                  key={event.id}
-                  onClick={() => handleClick(event.id)}
-                >
-                  <div className="h-44 md:h-full border-2 border-gray-200 border-opacity-10 rounded-lg overflow-hidden">
-                    <div className="relative">
-                      <img
-                        className="h-44 md:h-40 w-full object-cover object-center"
-                        src={event.event_image}
-                        alt={event.event_name}
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent"></div>
-                    </div>
-                    <div className="absolute bottom-0 w-full text-white p-4 ">
-                      <div>
-                        <h4 className="text-sm font-medium">{event.event_name}</h4>
-                      </div>
-                      <div className="flex justify-between">
-                        <div className="text-xs font-medium text-gray-400 mt-1">{formatDate(event.start_date)}</div>
-                        <button type="button" className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-red-300 font-medium rounded-sm text-xs p-1 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">Book Tickets</button>
-                      </div>
-                    </div>
+          <Slider {...settings}>
+            {events.map((event) => (
+              <div
+                className="p-1 md:p-1 w-full cursor-pointer"
+                key={event.id}
+                onClick={() => handleClick(event.id)}
+              >
+                <div className="relative group h-full border-2 border-gray-200 border-opacity-10 rounded-lg overflow-hidden">
+                  <img
+                    className="h-28 md:h-40 w-full object-cover object-center"
+                    src={event.event_image}
+                    alt={event.event_name}
+                  />
+                  <div className="absolute inset-0 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <CustomPrevArrow />
+                    <CustomNextArrow />
                   </div>
                 </div>
-              ))}
-            </Slider>
-          ) : (
-            <p>Loading events...</p>
-          )}
+                <h4 className="title-font text-sm font-medium text-white text-center">
+                  {event.event_name}
+                </h4>
+              </div>
+            ))}
+          </Slider>
         </div>
       </section>
     </>
