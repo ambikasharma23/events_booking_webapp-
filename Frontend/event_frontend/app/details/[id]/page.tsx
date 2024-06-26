@@ -1,14 +1,13 @@
 "use client"
 import React, { useEffect, useState } from "react";
-import TicketQuantity from "@/app/components/ticketquantity";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useParams } from "next/navigation";
 import Footer from "@/app/components/footer";
 import HomePage from "@/app/components/home/page";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCalendar } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCalendar } from "@fortawesome/free-solid-svg-icons";
 
 interface Event {
   id: number;
@@ -49,6 +48,12 @@ const EventDetails = () => {
   }>({});
   const [gallery, setGallery] = useState<Gallery[]>([]);
   const [openSessions, setOpenSessions] = useState<number[]>([]);
+  const [bookingInfo, setBookingInfo] = useState({
+    name: "",
+    phoneNumber: "",
+    ticketId: -1,
+    numberOfPersons: 0,
+  });
   const { id } = useParams();
 
   useEffect(() => {
@@ -79,6 +84,7 @@ const EventDetails = () => {
         console.error("Error fetching sessions:", error);
       }
     };
+
     const fetchGallery = async () => {
       try {
         const response = await fetch(
@@ -128,6 +134,49 @@ const EventDetails = () => {
 
     if (!ticketsBySession[sessionId]) {
       fetchTickets(sessionId);
+    }
+  };
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setBookingInfo((prevBookingInfo) => ({
+      ...prevBookingInfo,
+      [name]: value,
+    }));
+  };
+
+  const handleQuantityChange = (ticketId: number, quantity: number) => {
+    setBookingInfo((prevBookingInfo) => ({
+      ...prevBookingInfo,
+      ticketId,
+      numberOfPersons: quantity,
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      const response = await fetch("http://localhost:3001/booking/insert", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: bookingInfo.name,
+          contact: bookingInfo.phoneNumber,
+          ticket_id: bookingInfo.ticketId,
+          no_of_persons: bookingInfo.numberOfPersons,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to submit booking");
+      }
+      alert("Booking submitted successfully!");
+    } catch (error) {
+      console.error("Error submitting booking:", error);
+      alert("Error submitting booking. Please try again.");
     }
   };
 
@@ -189,9 +238,9 @@ const EventDetails = () => {
   return (
     <>
       <HomePage />
-      <div className="container mx-auto  pt-12">
+      <div className="container mx-auto pt-12">
         <div className="w-full flex flex-col lg:flex-row">
-          <div className="w-full lg:w-8/12 md:p-8 md:mt-1 mt-12" >
+          <div className="w-full lg:w-8/12 md:p-8 md:mt-1 mt-12">
             <div className="rounded-lg h-64 overflow-hidden">
               <img
                 alt="Event"
@@ -201,112 +250,185 @@ const EventDetails = () => {
             </div>
 
             <div className="bg-white rounded-md p-3 md:p-6">
-              <div className="font-extrabold flex justify-between">{event.event_name}
-              <div className="text-rose-600	">₹{event.starting_price} Onwards</div>
-
+              <div className="font-extrabold flex justify-between">
+                {event.event_name}
+                <div className="text-rose-600">
+                  ₹{event.starting_price} Onwards
+                </div>
               </div>
               <div className="text-sm">
-              <FontAwesomeIcon icon={faCalendar}/> {event.start_date}</div>
+                <FontAwesomeIcon icon={faCalendar} /> {event.start_date}
+              </div>
               <h1 className="items-center text-xl font-extrabold dark:text-white mt-4">
                 About Event
               </h1>
-              <p className="text-sm bg-zinc-100	p-3">{event.event_description}</p>
+              <p className="text-sm bg-zinc-100 p-3">
+                {event.event_description}
+              </p>
             </div>
             <div className="bg-white mt-4 rounded-sm">
-  <h1 className="items-center text-xl font-extrabold p-6">Highlights</h1>
-  {gallery.length > 0 ? (
-    <Slider {...settings}>
-      {gallery.map((galleryItem) => (
-        <div key={galleryItem.id} className="p-2 mb-4">
-          <div className="rounded-lg overflow-hidden">
-            <img
-              className="w-full h-48 md:h-36"
-              src={galleryItem.path}
-              alt="Gallery Image"
-            />
-          </div>
-        </div>
-      ))}
-    </Slider>
-  ) : (
-    <p className="text-center p-6">No highlights available.</p>
-  )}
-</div>
-
+              <h1 className="items-center text-xl font-extrabold p-6">
+                Highlights
+              </h1>
+              {gallery.length > 0 ? (
+                <Slider {...settings}>
+                  {gallery.map((galleryItem) => (
+                    <div key={galleryItem.id} className="p-2 mb-4">
+                      <div className="rounded-lg overflow-hidden">
+                        <img
+                          className="w-full h-48 md:h-36"
+                          src={galleryItem.path}
+                          alt="Gallery Image"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </Slider>
+              ) : (
+                <p className="text-center p-6">No highlights available.</p>
+              )}
+            </div>
           </div>
           <div className="w-full lg:w-5/12 pt-8">
             <div className="max-w-sm mx-auto bg-white p-2 rounded">
-            <h1 className="items-center text-xl font-extrabold dark:text-white">
-              Sessions
-            </h1>
-            <ul className="text-sm text-gray-700 dark:text-white">
-              {sessions.map((session) => (
-                <div
-                  key={session.id}
-                  className="bg-gray-800 p-4 rounded-md my-2 text-white"
-                >
-                  <div className="flex justify-between">
-                    <div className="text-yellow-500 font-bold">{session.session}</div>
-                    <div>
-                      {session.start_time} - {session.end_time}
-                    </div>
-                  </div>
-                  <div>{session.new_description}</div>
-                  <button
-                    onClick={() => handleSessionClick(session.id)}
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-2"
+              <h1 className="items-center text-xl font-extrabold dark:text-white">
+                Sessions
+              </h1>
+              <ul className="text-sm text-gray-700 dark:text-white">
+                {sessions.map((session) => (
+                  <div
+                    key={session.id}
+                    className="bg-gray-800 p-4 rounded-md my-2 text-white"
                   >
-                    {openSessions.includes(session.id)
-                      ? "Hide Tickets"
-                      : "View Tickets"}
-                  </button>
-
-                  {openSessions.includes(session.id) && (
-                    <div>
-                     
-                      {ticketsBySession[session.id] &&
-                      ticketsBySession[session.id].length > 0 ? (
-                        ticketsBySession[session.id].map((ticket) => (
-                          <div key={ticket.id}>
-                            <div className="py-2">
-                            <div className="flex justify-between">
-                              <div className="text-orange-400 font-bold">{ticket.ticket_name}</div>
-                              <div>{ticket.ticket_date}</div>
+                    <div className="flex justify-between">
+                      <div className="text-yellow-500 font-bold">
+                        {session.session}
+                      </div>
+                      <div>
+                        <button
+                          className="bg-rose-700 text-white font-bold py-2 px-4 rounded"
+                          onClick={() => handleSessionClick(session.id)}
+                        >
+                          {openSessions.includes(session.id)
+                            ? "Close Details"
+                            : "View Details"}
+                        </button>
+                      </div>
+                    </div>
+                    {openSessions.includes(session.id) && (
+                      <div>
+                        {ticketsBySession[session.id]?.map((ticket) => (
+                          <div key={ticket.id} className="mb-4">
+                            <div className="flex justify-between items-center">
+                              <div>
+                                <div className="font-bold">
+                                  {ticket.ticket_name}
+                                </div>
+                                <div>
+                                  {new Date(
+                                    ticket.ticket_date
+                                  ).toLocaleDateString()}
+                                </div>
+                                <div className="text-rose-600">
+                                  ₹{ticket.display_price}
+                                </div>
                               </div>
-                            <div className="flex justify-between">
-                             Valid for 1 person | ₹{ticket.display_price}
-                              <TicketQuantity ticket={ticket} />
-                            </div>
+                              <div className="flex items-center space-x-4">
+                                <button
+                                  className="text-xl text-gray-700 dark:text-white focus:outline-none"
+                                  onClick={() =>
+                                    handleQuantityChange(
+                                      ticket.id,
+                                      Math.max(
+                                        1,
+                                        bookingInfo.numberOfPersons - 1
+                                      )
+                                    )
+                                  }
+                                >
+                                  -
+                                </button>
+                                <span className="text-xl text-gray-700 dark:text-white">
+                                  {bookingInfo.ticketId === ticket.id &&
+                                  bookingInfo.numberOfPersons > 0
+                                    ? bookingInfo.numberOfPersons
+                                    : "Add"}
+                                </span>
+                                <button
+                                  className="text-xl text-gray-700 dark:text-white focus:outline-none"
+                                  onClick={() =>
+                                    handleQuantityChange(
+                                      ticket.id,
+                                      bookingInfo.numberOfPersons + 1
+                                    )
+                                  }
+                                >
+                                  +
+                                </button>
+                              </div>
                             </div>
                           </div>
-                        ))
-                      ) : (
-                        <p>No tickets available for this session.</p>
-                      )}
-                    </div>
-                  )}
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </ul>
+            </div>
+            <div className="max-w-sm mx-auto mt-6 bg-white p-2 rounded">
+              <h1 className="items-center text-xl font-extrabold dark:text-white">
+                Booking Form
+              </h1>
+              <form onSubmit={handleSubmit} className="mt-4">
+                <div className="mb-4">
+                  <label
+                    htmlFor="name"
+                    className="block text-gray-700 dark:text-white text-sm font-bold mb-2"
+                  >
+                    Name
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value={bookingInfo.name}
+                    onChange={handleInputChange}
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    required
+                  />
                 </div>
-              ))}
-              <form>
-              <div className="grid gap-6 mb-6 md:grid-cols-2">
-              <div>
-            <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>
-            <input type="text" id="company" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Enter Your Name" required />
-        </div>
-        <div>
-            <label  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Phone number</label>
-            <input type="tel" id="phone" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="123-45-678" pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}" required />
-        </div>
+                <div className="mb-4">
+                  <label
+                    htmlFor="phoneNumber"
+                    className="block text-gray-700 dark:text-white text-sm font-bold mb-2"
+                  >
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    id="phoneNumber"
+                    name="phoneNumber"
+                    value={bookingInfo.phoneNumber}
+                    onChange={handleInputChange}
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    required
+                  />
                 </div>
-                </form>
-            </ul>
+                <button
+                  type="submit"
+                  className="bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 px-4 rounded"
+                >
+                  Submit Booking
+                </button>
+              </form>
+            </div>
           </div>
-          <div className="bg-red-600 text-white rounded-sm p-4 mt-1 text-center mx-2">Book Now</div>        </div>
+        </div>
       </div>
       <Footer />
-    </div>
     </>
   );
 };
 
 export default EventDetails;
+
