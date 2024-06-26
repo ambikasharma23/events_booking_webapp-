@@ -1,6 +1,5 @@
 'use client';
 
-
 import React, { useEffect, useState } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
@@ -79,6 +78,21 @@ export default function EventExplorer() {
     }
   };
 
+  const fetchEventsByTag = async (tag: string) => {
+    try {
+      const url = `http://localhost:3001/events-by-tag?tags=${encodeURIComponent(tag)}`;
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error("Failed to fetch events");
+      }
+      const data: AllEvents[] = await response.json();
+      console.log(data);
+      setEvents(data);
+    } catch (error) {
+      console.error("Error fetching events by tag:", error);
+    }
+  };
+
   const handleOptionClick = (option: string) => {
     setSelectedOption(option);
     setShowDropdown(false);
@@ -140,14 +154,19 @@ export default function EventExplorer() {
       <div className="flex justify-between items-center p-5">
         <h1 className="text-white font-bold">Explore All Events</h1>
       </div>
-      <Tags
-        selectedOption={selectedOption}
-        setSelectedOption={setSelectedOption}
-        toggleDropdown={toggleDropdown}
-        handleOptionClick={handleOptionClick}
-        resetSelection={resetSelection} // Pass resetSelection function
-        showDropdown={showDropdown}
-      />
+
+      <div className="mb-8">
+        <Tags
+          selectedOption={selectedOption}
+          setSelectedOption={setSelectedOption}
+          toggleDropdown={toggleDropdown}
+          handleOptionClick={handleOptionClick}
+          resetSelection={resetSelection}
+          showDropdown={showDropdown}
+          handleTagClick={fetchEventsByTag} // Pass fetchEventsByTag function
+        />
+      </div>
+
       <section className="text-gray-100 body-font">
         <div className="container mx-auto">
           <Slider {...settings}>
@@ -179,4 +198,3 @@ export default function EventExplorer() {
     </>
   );
 }
-
