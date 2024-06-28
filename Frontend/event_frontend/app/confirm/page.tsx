@@ -11,7 +11,6 @@ const confirm = () => {
         Booking Successful !! Thanks For Submitting form
     </div>
     
-    
     </div>
     
     </>

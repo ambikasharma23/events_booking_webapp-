@@ -59,8 +59,7 @@ const EventDetails = () => {
     [key: number]: number;
   }>({});
   const { id } = useParams();
-  const router = useRouter(); 
-
+  const router = useRouter();
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -170,12 +169,14 @@ const EventDetails = () => {
       const selectedTickets = Object.keys(ticketQuantities).filter(
         (ticketId) => ticketQuantities[parseInt(ticketId, 10)] > 0
       );
-  
-      if (selectedTickets.length === 0) {
+      if (!selectedTickets || selectedTickets.length === 0) {
         setErrorMessage("Please select at least one ticket.");
+        console.log(
+          "No tickets selected or selectedTickets is null/undefined."
+        );
         return;
       }
-  
+
       const bookingPromises = selectedTickets.map(async (ticketIdStr) => {
         const ticketId = parseInt(ticketIdStr, 10);
         const response = await fetch("http://localhost:3001/booking/insert", {
@@ -190,16 +191,19 @@ const EventDetails = () => {
             no_of_persons: ticketQuantities[ticketId] || 1,
           }),
         });
-  
+
         if (!response.ok) {
           throw new Error(`Failed to submit booking for ticket ID ${ticketId}`);
         }
-  
+
         return await response.json();
       });
-  
+
       const results = await Promise.all(bookingPromises);
-      console.log("Booking results:", results);  
+      console.log("Booking results:", results);
+      alert("Bookings submitted successfully!");
+
+      // Reset bookingInfo and ticketQuantities state after successful submission
       setBookingInfo({
         name: "",
         phoneNumber: "",
@@ -207,7 +211,7 @@ const EventDetails = () => {
         numberOfPersons: 0,
       });
       setTicketQuantities({});
-      setErrorMessage(""); 
+      setErrorMessage(""); // Clear any previous error message here
 
       router.push("/confirm");
     } catch (error) {
@@ -215,8 +219,6 @@ const EventDetails = () => {
       alert("Error submitting booking. Please try again.");
     }
   };
-  
-
 
   if (!event) {
     return <div>Loading event...</div>;
@@ -242,9 +244,6 @@ const EventDetails = () => {
         onClick={onClick}
       />
     );
-  };
-  const areTicketsSelected = () => {
-    return Object.values(ticketQuantities).some(quantity => quantity > 0);
   };
 
   const settings = {
@@ -348,17 +347,17 @@ const EventDetails = () => {
                       <div>
                         {session.start_time}-{session.end_time}
                       </div>
-                      </div>
-                      {session.new_description}
-                      <div>
-                        <button
-                          className="bg-sky-500	 text-white font-bold py-2 px-4 rounded mt-2 mb-2"
-                          onClick={() => handleSessionClick(session.id)}
-                        >
-                          {openSessions.includes(session.id)
-                            ? "Hide Tickets"
-                            : "View Tickets"}
-                        </button>
+                    </div>
+                    {session.new_description}
+                    <div>
+                      <button
+                        className="bg-sky-500	 text-white font-bold py-2 px-4 rounded mt-2 mb-2"
+                        onClick={() => handleSessionClick(session.id)}
+                      >
+                        {openSessions.includes(session.id)
+                          ? "Hide Tickets"
+                          : "View Tickets"}
+                      </button>
                     </div>
                     {openSessions.includes(session.id) && (
                       <div>
@@ -374,42 +373,41 @@ const EventDetails = () => {
                                     ticket.ticket_date
                                   ).toLocaleDateString()}
                                 </div>
-                                </div>
-                                <div className="flex justify-between">
-
+                              </div>
+                              <div className="flex justify-between">
                                 <div className="text-white">
                                   Valid for 1 person | ₹{ticket.display_price}
                                 </div>
-                              <div className="flex items-center space-x-4">
-                                <button
-                                  className="text-xs text-white focus:outline-none bg-green-600 px-1 py-1 "
-                                  onClick={() =>
-                                    handleQuantityChange(
-                                      ticket.id,
-                                      Math.max(
-                                        0,
-                                        ticketQuantities[ticket.id] - 1
+                                <div className="flex items-center space-x-4">
+                                  <button
+                                    className="text-xs text-white focus:outline-none bg-green-600 px-1 py-1 "
+                                    onClick={() =>
+                                      handleQuantityChange(
+                                        ticket.id,
+                                        Math.max(
+                                          0,
+                                          ticketQuantities[ticket.id] - 1
+                                        )
                                       )
-                                    )
-                                  }
-                                >
-                                  -
-                                </button>
-                                <span className="text-xs text-white">
-                                  {ticketQuantities[ticket.id] || "Add"}
-                                </span>
-                                <button
-                                  className="text-xs text-white focus:outline-none bg-rose-600 px-1 py-1 "
-                                  onClick={() =>
-                                    handleQuantityChange(
-                                      ticket.id,
-                                      (ticketQuantities[ticket.id] || 0) + 1
-                                    )
-                                  }
-                                >
-                                  +
-                                </button>
-                              </div>
+                                    }
+                                  >
+                                    -
+                                  </button>
+                                  <span className="text-xs text-white">
+                                    {ticketQuantities[ticket.id] || "Add"}
+                                  </span>
+                                  <button
+                                    className="text-xs text-white focus:outline-none bg-rose-600 px-1 py-1 "
+                                    onClick={() =>
+                                      handleQuantityChange(
+                                        ticket.id,
+                                        (ticketQuantities[ticket.id] || 0) + 1
+                                      )
+                                    }
+                                  >
+                                    +
+                                  </button>
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -426,51 +424,50 @@ const EventDetails = () => {
               </h1>
               <form onSubmit={handleSubmit} className="mt-4">
                 <div className="grid gap-6 mb-6 md:grid-cols-2">
-                <div>
-                  <label
-                    htmlFor="name"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                  >
-                    Name
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={bookingInfo.name}
-                    onChange={handleInputChange}
-                    placeholder="Enter Your Name"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    required
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="phoneNumber" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                    Phone Number
-                  </label>
-                  <input
-                    type="tel"
-                    id="phoneNumber"
-                    name="phoneNumber"
-                    value={bookingInfo.phoneNumber}
-                    onChange={handleInputChange}
-                    placeholder="123-456-789"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    required
-                  />
-                </div>
+                  <div>
+                    <label
+                      htmlFor="name"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    >
+                      Name
+                    </label>
+                    <input
+                      type="text"
+                      id="name"
+                      name="name"
+                      value={bookingInfo.name}
+                      onChange={handleInputChange}
+                      placeholder="Enter Your Name"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="phoneNumber"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    >
+                      Phone Number
+                    </label>
+                    <input
+                      type="tel"
+                      id="phoneNumber"
+                      name="phoneNumber"
+                      value={bookingInfo.phoneNumber}
+                      onChange={handleInputChange}
+                      placeholder="123-456-789"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      required
+                    />
+                  </div>
                 </div>
                 {errorMessage && (
-  <div className="text-red-600 font-bold mb-4">
-    {errorMessage}
-  </div>
-)}
+                  <div className="text-red-600 font-bold ">{errorMessage}</div>
+                )}
 
                 <button
                   type="submit"
                   className="bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 px-4 rounded mt-4 w-full"
-                  disabled={!areTicketsSelected()} 
                 >
                   Book Now
                 </button>

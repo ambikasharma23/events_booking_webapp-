@@ -1,15 +1,26 @@
 const db = require("../models");
+const { Op } = require("sequelize");
 const Session = db.session;
 const Ticket = db.ticket;
 const Event = db.events;
 const EventException = db.event_exception;
+const ticket_inventory = db.ticket_inventory;
 
 const getTicket = async (req, res) => {
   try {
     const sessionId = req.query.session_id;
     let results;
     if (sessionId) {
-      results = await Ticket.findAll({ where: { session_id: sessionId } });
+      results = await Ticket.findAll({
+        where: { session_id: sessionId },
+        include: [
+          {
+            model: ticket_inventory,
+            as: 'ticket_inventory',
+            where: { quantity: { [Op.gt]: 0 } },
+          },
+        ],
+      });
     }
     res.status(200).send(results);
   } catch (error) {

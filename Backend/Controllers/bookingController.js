@@ -1,23 +1,37 @@
-const { ticket, ticket_inventory, event_booking, Sequelize } = require('../models');
+const {
+  ticket,
+  ticket_inventory,
+  event_booking,
+  Sequelize,
+} = require("../models");
 const { Op } = Sequelize;
 
 const createBooking = async (req, res) => {
-  const { customer_id, name, contact, ticket_id, status, booking_date, no_of_persons } = req.body;
+  const {
+    customer_id,
+    name,
+    contact,
+    ticket_id,
+    status,
+    booking_date,
+    no_of_persons,
+  } = req.body;
 
   try {
     const inventory = await ticket_inventory.findOne({
-      where: { ticket_id }
+      where: { ticket_id },
     });
-
+    if (!ticket_id) {
+      return res.status(404).json({ error: "Please select tickets" });
+    }
     if (!inventory) {
-      return res.status(404).json({ message: "Ticket inventory not found" });
+      return res.status(404).json({ error: "Ticket inventory not found" });
     }
 
     if (inventory.quantity < no_of_persons) {
-      return res.status(400).json({ message: "Not enough tickets available" });
+      return res.status(400).json({ error: "Not enough tickets available" });
     }
 
-  
     const booking = await event_booking.create({
       customer_id,
       name,
@@ -25,10 +39,9 @@ const createBooking = async (req, res) => {
       ticket_id,
       status,
       booking_date,
-      no_of_persons
+      no_of_persons,
     });
 
-   
     inventory.quantity -= no_of_persons;
     await inventory.save();
 
@@ -43,16 +56,16 @@ const getBookingById = async (req, res) => {
 
   try {
     const booking = await event_booking.findOne({
-      where: { id: booking_id }
+      where: { id: booking_id },
     });
 
     if (!booking) {
-      return res.status(404).json({ error: 'Booking not found' });
+      return res.status(404).json({ error: "Booking not found" });
     }
-    res.json({booking});
+    res.json({ booking });
   } catch (error) {
-    console.error('Error fetching booking:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error("Error fetching booking:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -62,15 +75,15 @@ const getBookings = async (req, res) => {
       include: [
         {
           model: ticket,
-          as: 'ticket',
+          as: "ticket",
           include: [
             {
               model: ticket_inventory,
-              as: 'ticket_inventory'
-            }
-          ]
-        }
-      ]
+              as: "ticket_inventory",
+            },
+          ],
+        },
+      ],
     });
 
     res.status(200).json(bookings);
@@ -83,7 +96,7 @@ const getBookingByCustId = async (req, res) => {
   try {
     const { custId } = req.params;
     const bookings = await event_booking.findAll({
-      where: { customer_id : custId },
+      where: { customer_id: custId },
     });
     if (bookings && bookings.length > 0) {
       res.status(200).json(bookings);
@@ -95,10 +108,9 @@ const getBookingByCustId = async (req, res) => {
   }
 };
 
-
 module.exports = {
   createBooking,
   getBookings,
   getBookingByCustId,
-  getBookingById
+  getBookingById,
 };
