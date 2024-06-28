@@ -200,8 +200,6 @@ const EventDetails = () => {
       });
 
       const results = await Promise.all(bookingPromises);
-      console.log("Booking results:", results);
-      alert("Bookings submitted successfully!");
 
       // Reset bookingInfo and ticketQuantities state after successful submission
       setBookingInfo({
