@@ -9,15 +9,26 @@ const Ticket = db.ticket;
 
 const getEvents = async (req, res) => {
   try {
-    const { id, event_name, category_id, search, event_category, limit, offset } = req.query;
+    const {
+      id,
+      event_name,
+      category_id,
+      search,
+      event_category,
+      limit,
+      offset,
+    } = req.query;
 
     // Define the common query options
     const queryOptions = {
+      where: {
+        end_date: { [Op.gt]: new Date() },
+      },
       include: [
         {
           model: City,
           as: "city",
-          attributes: ["name"], // Only include the city name
+          attributes: ["name"],
         },
       ],
     };
@@ -34,7 +45,7 @@ const getEvents = async (req, res) => {
     } else if (category_id) {
       queryOptions.where = { category_id };
       if (limit && !isNaN(parseInt(limit, 10))) {
-        queryOptions.limit = parseInt(limit, 10);   // Apply limit if provided and valid
+        queryOptions.limit = parseInt(limit, 10); // Apply limit if provided and valid
       }
       if (offset && !isNaN(parseInt(offset, 10))) {
         queryOptions.offset = parseInt(offset, 10); // Apply offset if provided and valid
@@ -48,7 +59,7 @@ const getEvents = async (req, res) => {
         where: { name: event_category },
       });
       if (limit && !isNaN(parseInt(limit, 10))) {
-        queryOptions.limit = parseInt(limit, 10);   // Apply limit if provided and valid
+        queryOptions.limit = parseInt(limit, 10); // Apply limit if provided and valid
       }
       if (offset && !isNaN(parseInt(offset, 10))) {
         queryOptions.offset = parseInt(offset, 10); // Apply offset if provided and valid
@@ -63,7 +74,7 @@ const getEvents = async (req, res) => {
         ],
       };
       if (limit && !isNaN(parseInt(limit, 10))) {
-        queryOptions.limit = parseInt(limit, 10);   // Apply limit if provided and valid
+        queryOptions.limit = parseInt(limit, 10); // Apply limit if provided and valid
       }
       if (offset && !isNaN(parseInt(offset, 10))) {
         queryOptions.offset = parseInt(offset, 10); // Apply offset if provided and valid
@@ -143,11 +154,11 @@ const getTodayEvent = async (req, res) => {
     const results = await Event.findAll({
       include: {
         model: Session,
-        as: 'session', // Specify the alias here
+        as: "session", // Specify the alias here
         required: true, // Ensures only Events with Sessions are included
         include: {
           model: Ticket,
-          as: 'ticket', // Specify the alias here
+          as: "ticket", // Specify the alias here
           where: {
             ticket_date: {
               [Op.eq]: formattedDate,
