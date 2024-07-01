@@ -7,47 +7,6 @@ const Category = db.event_category;
 const moment = require("moment");
 const Ticket = db.ticket;
 
-// const filterEvents = (events, eventExceptions) => {
-//   const currentDate = new Date();
-//   const formatCurrentDate = moment(currentDate).format("YYYY-MM-DD");
-//   const currentDay = currentDate.getDay();
-//   console.log(currentDay);
-
-//   return events.filter((event) => {
-//     const isException = eventExceptions.some((exception) => {
-//       const startDate = exception.start_date
-//         ? new Date(exception.start_date)
-//         : null;
-//       const endDate = exception.end_date ? new Date(exception.end_date) : null;
-//       const exceptionStart = startDate
-//         ? moment(startDate).format("YYYY-MM-DD")
-//         : null;
-//       const exceptionEnd = endDate
-//         ? moment(endDate).format("YYYY-MM-DD")
-//         : null;
-
-//       return (
-//         exception.event_id === event.id &&
-//         ((!startDate &&
-//           !endDate &&
-//           exception.day &&
-//           currentDay === exception.day) ||
-//           !startDate ||
-//           exceptionStart === formatCurrentDate ||
-//           !endDate ||
-//           exceptionEnd >= formatCurrentDate ||
-//           ((!exception.day || currentDay === exception.day) &&
-//             (!exception.session_id ||
-//               exception.session_id === event.session_id)))
-//       );
-//     });
-
-//     return (
-//       !isException && moment(event.end_date).isSameOrAfter(formatCurrentDate)
-//     );
-//   });
-// };
-
 const getEvents = async (req, res) => {
   try {
     const {
@@ -258,21 +217,15 @@ const newEvent = async (req, res) => {
 
 const deleteEvent = async (req, res) => {
   try {
-    const eventId = req.params.id;
-    const event = await Event.findByPk(eventId);
-    console.log(event);
+    const event = await Event.findByPk(req.params.id);
     if (!event) {
-      return res.status(404).json({ error: "Event not found" });
+      return res.status(404).json({ error: 'Event not found' });
     }
-    await Event.destroy({
-      where: {
-        id: eventId,
-      },
-    });
-    res.status(200).json({ message: "Event deleted successfully" });
+    await event.destroy();
+    res.status(200).json({ message: 'Event deleted successfully' });
   } catch (error) {
-    console.error("Error deleting event:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    console.error('Error deleting event:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 };
 
