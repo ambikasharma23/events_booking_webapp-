@@ -63,7 +63,7 @@ const getEvents = async (req, res) => {
     // Define the common query options
     const queryOptions = {
       where: {
-        end_date: { [Op.gt]: new Date() },
+        end_date: { [Op.gte]: new Date() },
       },
       include: [
         {
