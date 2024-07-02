@@ -6,6 +6,7 @@ const Session = db.session;
 const Category = db.event_category;
 const moment = require("moment");
 const Ticket = db.ticket;
+const redis = require("../utils/redis");
 
 const getEvents = async (req, res) => {
   try {
@@ -18,6 +19,11 @@ const getEvents = async (req, res) => {
       limit,
       offset,
     } = req.query;
+    const cacheKey = JSON.stringify(req.query); 
+    let cachedData = await redis.get(cacheKey);
+    if (cachedData) {
+      return res.status(200).json(JSON.parse(cachedData));
+    }
 
     // Define the common query options
     const queryOptions = {
@@ -33,24 +39,26 @@ const getEvents = async (req, res) => {
       ],
     };
 
-    // Adjust query options based on the query parameters
     if (id) {
       queryOptions.where = { id };
       const result = await Event.findOne(queryOptions);
+      await redis.set(cacheKey, JSON.stringify(result), 'EX', 3600); // Cache for 1 hour
       return res.status(200).send(result);
     } else if (event_name) {
       queryOptions.where = { event_name };
       const result = await Event.findOne(queryOptions);
+      await redis.set(cacheKey, JSON.stringify(result), 'EX', 3600);
       return res.status(200).send(result);
     } else if (category_id) {
       queryOptions.where = { category_id };
       if (limit && !isNaN(parseInt(limit, 10))) {
-        queryOptions.limit = parseInt(limit, 10); // Apply limit if provided and valid
+        queryOptions.limit = parseInt(limit, 10);
       }
       if (offset && !isNaN(parseInt(offset, 10))) {
-        queryOptions.offset = parseInt(offset, 10); // Apply offset if provided and valid
+        queryOptions.offset = parseInt(offset, 10);
       }
       const results = await Event.findAll(queryOptions);
+      await redis.set(cacheKey, JSON.stringify(results), 'EX', 3600);
       return res.status(200).send(results);
     } else if (event_category) {
       queryOptions.include.push({
@@ -59,12 +67,13 @@ const getEvents = async (req, res) => {
         where: { name: event_category },
       });
       if (limit && !isNaN(parseInt(limit, 10))) {
-        queryOptions.limit = parseInt(limit, 10); // Apply limit if provided and valid
+        queryOptions.limit = parseInt(limit, 10);
       }
       if (offset && !isNaN(parseInt(offset, 10))) {
-        queryOptions.offset = parseInt(offset, 10); // Apply offset if provided and valid
+        queryOptions.offset = parseInt(offset, 10);
       }
       const results = await Event.findAll(queryOptions);
+      await redis.set(cacheKey, JSON.stringify(results), 'EX', 3600);
       return res.status(200).send(results);
     } else if (search) {
       queryOptions.where = {
@@ -74,16 +83,15 @@ const getEvents = async (req, res) => {
         ],
       };
       if (limit && !isNaN(parseInt(limit, 10))) {
-        queryOptions.limit = parseInt(limit, 10); // Apply limit if provided and valid
+        queryOptions.limit = parseInt(limit, 10);
       }
       if (offset && !isNaN(parseInt(offset, 10))) {
-        queryOptions.offset = parseInt(offset, 10); // Apply offset if provided and valid
+        queryOptions.offset = parseInt(offset, 10);
       }
       const results = await Event.findAll(queryOptions);
+      await redis.set(cacheKey, JSON.stringify(results), 'EX', 3600);
       return res.status(200).send(results);
     } else {
-      // Fetch all events if no specific query parameters are provided
-      // Default limit and offset to undefined if not provided
       if (limit && !isNaN(parseInt(limit, 10))) {
         queryOptions.limit = parseInt(limit, 10);
       }
@@ -91,6 +99,7 @@ const getEvents = async (req, res) => {
         queryOptions.offset = parseInt(offset, 10);
       }
       const results = await Event.findAll(queryOptions);
+      await redis.set(cacheKey, JSON.stringify(results), 'EX', 3600);
       return res.status(200).send(results);
     }
   } catch (error) {
