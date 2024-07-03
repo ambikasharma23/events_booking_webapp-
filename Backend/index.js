@@ -1,14 +1,18 @@
 const express = require("express");
 const cron = require("node-cron");
+const dotenv = require("dotenv");
 const app = express();
 const db = require("./models");
-const recurrentEvent = require("./Controllers/recurrentEvent");
+
 const cors = require("cors");
 
+dotenv.config();
 const PORT = process.env.PORT || 3001;
 app.use(cors());
 
+
 app.use(express.json());
+app.use("/", require("./Routes/customerRoute"));
 app.use("/", require("./Routes/eventRoute"));
 app.use("/", require("./Routes/sessionsRoutes"));
 app.use("/", require("./Routes/ticketRoute"));
