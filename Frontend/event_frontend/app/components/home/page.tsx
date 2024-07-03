@@ -1,10 +1,17 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 type Location = {
   latitude: number | null;
   longitude: number | null;
+};
+
+type Result = {
+  id: number;
+  event_name: string;
+  event_image: string;
 };
 
 export default function HomePage() {
@@ -14,24 +21,23 @@ export default function HomePage() {
   });
   const [locationError, setLocationError] = useState<string | null>(null);
   const [city, setCity] = useState<string | null>(null);
-  const [backgroundColor, setBackgroundColor] = useState<string>("transparent"); // Initialize with transparent
+  const [backgroundColor, setBackgroundColor] = useState<string>("transparent");
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<Result[]>([]);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+  const [searchInitiated, setSearchInitiated] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
-    // Add event listener for scroll
     const handleScroll = () => {
       const scrollY = window.scrollY;
-      // Set background color based on scroll position
       if (scrollY > 0) {
-        setBackgroundColor("rgba(0, 0, 0, 0.9)"); // Transparent black color
+        setBackgroundColor("rgba(0, 0, 0, 0.9)");
       } else {
         setBackgroundColor("transparent");
       }
     };
-
-    // Attach scroll event listener when component mounts
     window.addEventListener("scroll", handleScroll);
-
-    // Clean up event listener on component unmount
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
@@ -55,6 +61,54 @@ export default function HomePage() {
     }
   }, []);
 
+  const debounce = (func: (...args: any[]) => void, wait: number) => {
+    let timeout: NodeJS.Timeout;
+    return (...args: any[]) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func(...args), wait);
+    };
+  };
+
+  const handleClick = (id: number) => {
+    router.push(`/details/${id}`);
+  };
+
+  const fetchSearchResults = async (query: string) => {
+    if (!query) {
+      setResults([]);
+      setSearchInitiated(false);
+      return;
+    }
+
+    setSearchInitiated(true);
+
+    const apiUrl = `http://localhost:3001/allevents?search=${query}`;
+
+    try {
+      const response = await fetch(apiUrl);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data: Result[] = await response.json();
+      console.log("Fetched data:", data);
+      setResults(data);
+      setFetchError(null);
+    } catch (error) {
+      console.error("Error fetching search results:", error);
+      setFetchError("Error fetching search results");
+      setResults([]);
+    }
+  };
+
+  const debouncedFetchSearchResults = useCallback(
+    debounce((query) => fetchSearchResults(query), 300),
+    []
+  );
+
+  useEffect(() => {
+    debouncedFetchSearchResults(query);
+  }, [query]);
+
   const fetchCityName = async (lat: number, lon: number) => {
     try {
       const response = await fetch(
@@ -67,45 +121,98 @@ export default function HomePage() {
     }
   };
 
+  const clearSearch = () => {
+    setQuery("");
+    setResults([]);
+    setSearchInitiated(false);
+  };
+
   return (
-    <div className="font-sans fixed w-full" style={{ backgroundColor }}>
-      <header className="flex justify-between items-center p-2 md:px-8 md:py-5">
-        <div className="flex items-center space-x-8">
-          <div className="flex items-center space-x-0">
-            <img
-              src={"/images/logo1.gif"}
-              alt="Logo"
-              className="h-12 w-12 mr-2"
+    <div>
+      <div className="font-sans fixed w-full top-0" style={{ backgroundColor }}>
+        <header className="flex justify-between items-center p-2 md:px-8">
+          <div className="flex items-center space-x-8">
+            <div className="flex items-center space-x-0">
+              <img
+                src={"/images/logo1.gif"}
+                alt="Logo"
+                className="h-12 w-12 mr-2"
+              />
+              <div className="text-sm md:text-3xl font-bold text-white">
+                <Link href="/">eazyEvents</Link>
+              </div>
+            </div>
+            <div className="text-sm text-white">
+              {location.latitude !== null && location.longitude !== null ? (
+                <div className="flex items-center bg-transparent border-2 border-white text-white p-1 md:p-2 rounded-lg">
+                  <span>{city || "Fetching city..."}</span>
+                </div>
+              ) : (
+                <div className="bg-transparent border-2 border-white text-white p-2 rounded-lg">
+                  {locationError || "Fetching location..."}
+                </div>
+              )}
+            </div>
+          </div>
+          <form
+            className="w-20 md:w-1/6 flex justify-end relative"
+            onSubmit={(e) => e.preventDefault()}
+          >
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search..."
+              className="w-full px-3 py-1 rounded-lg bg-gray-200 text-gray-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-gray-300"
             />
-            <div className="text-sm md:text-3xl font-bold text-white">
-              <Link href="/">eazyEvents</Link>
-            </div>{" "}
-          </div>
-
-          <div className="text-sm text-white">
-            {location.latitude !== null && location.longitude !== null ? (
-              <div className="flex items-center bg-transparent border-2 border-white text-white p-1 md:p-2 rounded-lg">
-                {/* <span className="mr-2">City:</span> */}
-                <span>{city || "Fetching city..."}</span>
-              </div>
-            ) : (
-              <div className="bg-transparent border-2 border-white text-white p-2 rounded-lg">
-                {locationError || "Fetching location..."}
-              </div>
+            {searchInitiated && (
+              <button
+                type="button"
+                className="absolute right-0 top-0 h-full px-3 py-1 text-gray-500 focus:outline-none"
+                onClick={clearSearch}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
             )}
-          </div>
-        </div>
+          </form>
+        </header>
+      </div>
 
-        <div className="w-20 md:w-1/6 flex justify-end">
-          {" "}
-          {/* Adjusted input field alignment */}
-          <input
-            type="text"
-            placeholder="Search..."
-            className="w-full px-3 py-1 rounded-lg bg-gray-200 text-gray-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-gray-300"
-          />
-        </div>
-      </header>
+      {searchInitiated && (
+        <main className="fixed top-20 right-8 p-4 bg-white w-46 max-h-96 overflow-y-scroll">
+          <h1 className="text-2xl font-bold">Search Results</h1>
+          {fetchError && <p className="text-red-500">{fetchError}</p>}
+          <ul className="mt-4">
+            {results.length > 0 ? (
+              results.map((result) => (
+                <li
+                  key={result.id}
+                  className="p-2 border-b border-gray-200 flex justify-between cursor-pointer"
+                  onClick={() => handleClick(result.id)}
+                >
+                  <img className="w-20 p-1" src={result.event_image} />
+                  {result.event_name}
+                </li>
+              ))
+            ) : (
+              <li className="text-red">No results found</li>
+            )}
+          </ul>
+        </main>
+      )}
     </div>
   );
 }

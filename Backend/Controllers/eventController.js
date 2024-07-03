@@ -105,7 +105,7 @@ const getEvents = async (req, res) => {
         queryOptions.offset = parseInt(offset, 10);
       }
       const results = await Event.findAll(queryOptions);
-      await redis.set(cacheKey, JSON.stringify(results), "EX", 3600);
+      // await redis.set(cacheKey, JSON.stringify(results), "EX", 3600);
       return res.status(200).send(results);
     }
   } catch (error) {
@@ -180,7 +180,7 @@ const getTodayEvent = async (req, res) => {
   try {
     const today = new Date();
     const formattedDate = moment(today).format("YYYY-MM-DD");
-    const cacheKey = 'Today Events'; 
+    const cacheKey = "Today Events";
     const cachedData = await redis.get(cacheKey);
 
     if (cachedData) {
@@ -191,21 +191,21 @@ const getTodayEvent = async (req, res) => {
     const results = await Event.findAll({
       include: {
         model: Session,
-        as: "session", 
-        required: true, 
+        as: "session",
+        required: true,
         include: {
           model: Ticket,
-          as: "ticket", 
+          as: "ticket",
           where: {
             ticket_date: {
               [Op.eq]: formattedDate,
             },
           },
-          required: true, 
+          required: true,
         },
       },
     });
-    await redis.set(cacheKey, JSON.stringify(results), 'EX', 3600);
+    await redis.set(cacheKey, JSON.stringify(results), "EX", 3600);
     return res.status(200).json(results);
   } catch (err) {
     console.error(err);
