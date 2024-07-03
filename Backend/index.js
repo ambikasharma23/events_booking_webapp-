@@ -12,7 +12,7 @@ app.use(cors());
 
 
 app.use(express.json());
-app.use("/", require("./Routes/customerRoute"));
+// app.use("/", require("./Routes/customerRoute"));
 app.use("/", require("./Routes/eventRoute"));
 app.use("/", require("./Routes/sessionsRoutes"));
 app.use("/", require("./Routes/ticketRoute"));
