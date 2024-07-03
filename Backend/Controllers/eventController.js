@@ -19,10 +19,16 @@ const getEvents = async (req, res) => {
       limit,
       offset,
     } = req.query;
-    const cacheKey = JSON.stringify(req.query); 
-    let cachedData = await redis.get(cacheKey);
+    const cacheKey = `events_${
+      id || event_name || category_id || event_category || search || "all"
+    } ${limit || "default"} ${offset || "default"}`;
+
+    // Try to get cached data
+    const cachedData = await redis.get(cacheKey);
+
     if (cachedData) {
-      return res.status(200).json(JSON.parse(cachedData));
+      const parsedData = JSON.parse(cachedData);
+      return res.status(200).send(parsedData);
     }
 
     // Define the common query options
@@ -42,12 +48,12 @@ const getEvents = async (req, res) => {
     if (id) {
       queryOptions.where = { id };
       const result = await Event.findOne(queryOptions);
-      await redis.set(cacheKey, JSON.stringify(result), 'EX', 3600); // Cache for 1 hour
+      await redis.set(cacheKey, JSON.stringify(result), "EX", 3600);
       return res.status(200).send(result);
     } else if (event_name) {
       queryOptions.where = { event_name };
       const result = await Event.findOne(queryOptions);
-      await redis.set(cacheKey, JSON.stringify(result), 'EX', 3600);
+      await redis.set(cacheKey, JSON.stringify(result), "EX", 3600);
       return res.status(200).send(result);
     } else if (category_id) {
       queryOptions.where = { category_id };
@@ -58,7 +64,7 @@ const getEvents = async (req, res) => {
         queryOptions.offset = parseInt(offset, 10);
       }
       const results = await Event.findAll(queryOptions);
-      await redis.set(cacheKey, JSON.stringify(results), 'EX', 3600);
+      await redis.set(cacheKey, JSON.stringify(results), "EX", 3600);
       return res.status(200).send(results);
     } else if (event_category) {
       queryOptions.include.push({
@@ -73,7 +79,7 @@ const getEvents = async (req, res) => {
         queryOptions.offset = parseInt(offset, 10);
       }
       const results = await Event.findAll(queryOptions);
-      await redis.set(cacheKey, JSON.stringify(results), 'EX', 3600);
+      await redis.set(cacheKey, JSON.stringify(results), "EX", 3600);
       return res.status(200).send(results);
     } else if (search) {
       queryOptions.where = {
@@ -89,7 +95,7 @@ const getEvents = async (req, res) => {
         queryOptions.offset = parseInt(offset, 10);
       }
       const results = await Event.findAll(queryOptions);
-      await redis.set(cacheKey, JSON.stringify(results), 'EX', 3600);
+      await redis.set(cacheKey, JSON.stringify(results), "EX", 3600);
       return res.status(200).send(results);
     } else {
       if (limit && !isNaN(parseInt(limit, 10))) {
@@ -99,7 +105,7 @@ const getEvents = async (req, res) => {
         queryOptions.offset = parseInt(offset, 10);
       }
       const results = await Event.findAll(queryOptions);
-      await redis.set(cacheKey, JSON.stringify(results), 'EX', 3600);
+      await redis.set(cacheKey, JSON.stringify(results), "EX", 3600);
       return res.status(200).send(results);
     }
   } catch (error) {
@@ -118,6 +124,13 @@ const EventsthisWeak = async (req, res) => {
     startOfWeek.setHours(0, 0, 0, 0);
     const endOfWeek = new Date(today.setDate(diff + 6));
     endOfWeek.setHours(23, 59, 59, 999);
+    const cacheKey = "eventsthisweek";
+    const cachedData = await redis.get(cacheKey);
+
+    if (cachedData) {
+      const parsedData = JSON.parse(cachedData);
+      return res.status(200).send(parsedData);
+    }
 
     const weeklyEvents = await Event.findAll({
       where: {
@@ -126,8 +139,8 @@ const EventsthisWeak = async (req, res) => {
         },
       },
     });
-
-    res.status(200).json(weeklyEvents);
+    await redis.set(cacheKey, JSON.stringify(weeklyEvents), "EX", 3600);
+    return res.status(200).json(weeklyEvents);
   } catch (error) {
     console.error("Error fetching events:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -137,6 +150,13 @@ const EventsthisWeak = async (req, res) => {
 const getNightEvents = async (req, res) => {
   try {
     const lateTime = "19:00:00";
+    const cacheKey = "Night Events";
+    const cachedData = await redis.get(cacheKey);
+
+    if (cachedData) {
+      const parsedData = JSON.parse(cachedData);
+      return res.status(200).send(parsedData);
+    }
     const results = await Event.findAll({
       include: {
         model: Session,
@@ -148,7 +168,8 @@ const getNightEvents = async (req, res) => {
         },
       },
     });
-    res.status(200).send(results);
+    await redis.set(cacheKey, JSON.stringify(results), "EX", 3600);
+    return res.status(200).json(results);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Error while fetching sessions" });
@@ -159,26 +180,33 @@ const getTodayEvent = async (req, res) => {
   try {
     const today = new Date();
     const formattedDate = moment(today).format("YYYY-MM-DD");
+    const cacheKey = 'Today Events'; 
+    const cachedData = await redis.get(cacheKey);
+
+    if (cachedData) {
+      const parsedData = JSON.parse(cachedData);
+      return res.status(200).send(parsedData);
+    }
 
     const results = await Event.findAll({
       include: {
         model: Session,
-        as: "session", // Specify the alias here
-        required: true, // Ensures only Events with Sessions are included
+        as: "session", 
+        required: true, 
         include: {
           model: Ticket,
-          as: "ticket", // Specify the alias here
+          as: "ticket", 
           where: {
             ticket_date: {
               [Op.eq]: formattedDate,
             },
           },
-          required: true, // Ensures only Sessions with Tickets are included
+          required: true, 
         },
       },
     });
-
-    res.status(200).send(results);
+    await redis.set(cacheKey, JSON.stringify(results), 'EX', 3600);
+    return res.status(200).json(results);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Error while fetching events" });
@@ -228,13 +256,13 @@ const deleteEvent = async (req, res) => {
   try {
     const event = await Event.findByPk(req.params.id);
     if (!event) {
-      return res.status(404).json({ error: 'Event not found' });
+      return res.status(404).json({ error: "Event not found" });
     }
     await event.destroy();
-    res.status(200).json({ message: 'Event deleted successfully' });
+    res.status(200).json({ message: "Event deleted successfully" });
   } catch (error) {
-    console.error('Error deleting event:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error("Error deleting event:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 

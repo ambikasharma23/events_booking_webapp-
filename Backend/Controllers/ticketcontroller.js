@@ -3,6 +3,7 @@ const { Op } = require("sequelize");
 const Session = db.session;
 const Ticket = db.ticket;
 const Event = db.events;
+const redis = require("../utils/redis");
 const EventException = db.event_exception;
 const ticket_inventory = db.ticket_inventory;
 
@@ -10,6 +11,13 @@ const getTicket = async (req, res) => {
   try {
     const sessionId = req.query.session_id;
     let results;
+    const cacheKey = 'tickets'; 
+    const cachedData = await redis.get(cacheKey);
+
+    if (cachedData) {
+      const parsedData = JSON.parse(cachedData);
+      return res.status(200).send(parsedData);
+    }
     if (sessionId) {
       results = await Ticket.findAll({
         where: { session_id: sessionId },
@@ -22,7 +30,8 @@ const getTicket = async (req, res) => {
         ],
       });
     }
-    res.status(200).send(results);
+    await redis.set(cacheKey, JSON.stringify(results), 'EX', 3600);
+    return res.status(200).json(results);
   } catch (error) {
     console.error("Error handling request:", error);
     res.status(500).json({ error: "Internal Server Error" });
