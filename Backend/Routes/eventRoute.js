@@ -11,4 +11,5 @@ router.get("/allevents/weeklyEvent", eventController.EventsthisWeak);
 router.get("/allevents/:id", eventController.getEventsbyId);
 router.delete("/delete/:id", eventController.deleteEvent);
 
+
 module.exports = router;

@@ -26,20 +26,22 @@ function haversineDistance(lat1, lon1, lat2, lon2) {
 
 const getNearbyEvents = async (req, res) => {
   const { lat, lon, maxDistance = 100 } = req.query;
+  const { latitude: userLat, longitude: userLon } = req.body; // Fetch user's location from request body
 
-  if (!lat || !lon) {
+  // Ensure we have latitude and longitude either from query or request body
+  if ((!lat || !lon) && (!userLat || !userLon)) {
     return res.status(400).json({ error: 'Latitude and longitude are required' });
   }
 
-  const latitude = parseFloat(lat);
-  const longitude = parseFloat(lon);
+  const latitude = parseFloat(lat || userLat); // Use query latitude if present, otherwise use user's latitude
+  const longitude = parseFloat(lon || userLon); // Use query longitude if present, otherwise use user's longitude
   const maxDist = parseFloat(maxDistance);
 
   try {
     const restaurants = await restaurant.findAll({
       include: {
-        model: events, 
-        as: 'events', 
+        model: events,
+        as: 'events',
         required: true
       }
     });
@@ -59,5 +61,23 @@ const getNearbyEvents = async (req, res) => {
     res.status(500).json({ error: 'An error occurred while fetching events' });
   }
 };
+// controllers/locationController.js
 
-module.exports = { getNearbyEvents };
+const updateLocation = async (req, res) => {
+  const { latitude, longitude } = req.body;
+
+  try {
+    // Process the latitude and longitude data as needed
+    console.log(`Received location update: ${latitude}, ${longitude}`);
+    // You can perform additional operations here (e.g., updating user's location in database)
+    res.status(200).json({ message: 'Location updated successfully' });
+  } catch (error) {
+    console.error('Error updating location:', error);
+    res.status(500).json({ error: 'Failed to update location' });
+  }
+};
+
+
+
+
+module.exports = { getNearbyEvents, updateLocation};
