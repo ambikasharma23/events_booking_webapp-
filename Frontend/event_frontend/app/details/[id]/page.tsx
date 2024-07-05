@@ -169,11 +169,9 @@ const EventDetails = () => {
       const selectedTickets = Object.keys(ticketQuantities).filter(
         (ticketId) => ticketQuantities[parseInt(ticketId, 10)] > 0
       );
+
       if (!selectedTickets || selectedTickets.length === 0) {
         setErrorMessage("Please select at least one ticket.");
-        console.log(
-          "No tickets selected or selectedTickets is null/undefined."
-        );
         return;
       }
 
@@ -196,12 +194,18 @@ const EventDetails = () => {
           throw new Error(`Failed to submit booking for ticket ID ${ticketId}`);
         }
 
-        return await response.json();
+        const result = await response.json();
+        console.log(`Response for ticket ID ${ticketId}:`, result); 
+        if (!result.booking || !result.booking.id) {
+          throw new Error(`booking_id is undefined for ticket ID ${ticketId}`);
+        }
+
+        return result.booking.id;
       });
 
-      const results = await Promise.all(bookingPromises);
+      const bookingIds = await Promise.all(bookingPromises);
+      console.log("Booking IDs:", bookingIds); 
 
-      // Reset bookingInfo and ticketQuantities state after successful submission
       setBookingInfo({
         name: "",
         phoneNumber: "",
@@ -209,9 +213,14 @@ const EventDetails = () => {
         numberOfPersons: 0,
       });
       setTicketQuantities({});
-      setErrorMessage(""); // Clear any previous error message here
+      setErrorMessage(""); 
 
-      router.push("/confirm");
+      const queryParams = new URLSearchParams({
+        bookingIds: JSON.stringify(bookingIds),
+      }).toString();
+
+      console.log("Query Params:", queryParams); 
+      router.push(`/confirm?${queryParams}`);
     } catch (error) {
       console.error("Error submitting booking:", error);
       alert("Error submitting booking. Please try again.");
