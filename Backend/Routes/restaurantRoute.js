@@ -1,8 +1,9 @@
 const express = require('express');
-const { getNearbyEvents } = require('../Controllers/restaurantcontroller');
+const { getNearbyEvents ,updateLocation} = require('../Controllers/restaurantcontroller');
 
 const router = express.Router();
 
-router.get('/restaurants', getNearbyEvents);
+router.get('/restaurants',getNearbyEvents);
+router.post('/updateLocation',updateLocation);
 
 module.exports = router;
