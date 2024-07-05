@@ -7,6 +7,7 @@ const Category = db.event_category;
 const moment = require("moment");
 const Ticket = db.ticket;
 const redis = require("../utils/redis");
+const { getUserLocation } = require('./restaurantcontroller');
 
 const getEvents = async (req, res) => {
   try {
@@ -113,6 +114,8 @@ const getEvents = async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+
 
 const EventsthisWeak = async (req, res) => {
   try {

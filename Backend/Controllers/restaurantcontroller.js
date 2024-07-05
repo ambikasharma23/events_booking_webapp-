@@ -1,6 +1,8 @@
 const { Op } = require('sequelize');
 const { restaurant, events } = require('../models');
 
+let userLocation = { latitude: null, longitude: null };
+
 // Haversine function to calculate distance between two points
 function haversineDistance(lat1, lon1, lat2, lon2) {
   const toRadians = angle => angle * (Math.PI / 180.0);
@@ -25,17 +27,13 @@ function haversineDistance(lat1, lon1, lat2, lon2) {
 }
 
 const getNearbyEvents = async (req, res) => {
-  const { lat, lon, maxDistance = 100 } = req.query;
-  const { latitude: userLat, longitude: userLon } = req.body; // Fetch user's location from request body
-
-  // Ensure we have latitude and longitude either from query or request body
-  if ((!lat || !lon) && (!userLat || !userLon)) {
-    return res.status(400).json({ error: 'Latitude and longitude are required' });
+  const { latitude, longitude } = userLocation;
+  console.log(`Current stored location: ${latitude}, ${longitude}`);
+  if (!latitude || !longitude) {
+    return res.status(400).json({ error: 'User location not available' });
   }
 
-  const latitude = parseFloat(lat || userLat); // Use query latitude if present, otherwise use user's latitude
-  const longitude = parseFloat(lon || userLon); // Use query longitude if present, otherwise use user's longitude
-  const maxDist = parseFloat(maxDistance);
+  const maxDistance = req.query.maxDistance || 10; // Set default to 10 km
 
   try {
     const restaurants = await restaurant.findAll({
@@ -49,8 +47,8 @@ const getNearbyEvents = async (req, res) => {
     const nearbyEvents = restaurants
       .filter(restaurant => {
         const distance = haversineDistance(latitude, longitude, restaurant.latitude, restaurant.longitude);
-        console.log(`Distance to ${restaurant.restaurant_name}: ${distance} km`); // Log the distance
-        return distance <= maxDist;
+        console.log(`Distance to ${restaurant.restaurant_name}: ${distance} km`); 
+        return distance <= maxDistance;
       })
       .map(restaurant => restaurant.events)
       .flat();
@@ -61,23 +59,25 @@ const getNearbyEvents = async (req, res) => {
     res.status(500).json({ error: 'An error occurred while fetching events' });
   }
 };
-// controllers/locationController.js
 
-const updateLocation = async (req, res) => {
+const updateLocation = (req, res) => {
   const { latitude, longitude } = req.body;
 
-  try {
-    // Process the latitude and longitude data as needed
+  if (latitude && longitude) {
+    userLocation = { latitude, longitude };
     console.log(`Received location update: ${latitude}, ${longitude}`);
-    // You can perform additional operations here (e.g., updating user's location in database)
-    res.status(200).json({ message: 'Location updated successfully' });
-  } catch (error) {
-    console.error('Error updating location:', error);
-    res.status(500).json({ error: 'Failed to update location' });
+    // Call getNearbyEvents() here to fetch nearby events based on the updated location
+    getNearbyEvents(req, res);
+    // Respond with a success message if needed
+    // res.status(200).json({ message: 'Location updated successfully' });
+  } else {
+    res.status(400).json({ error: 'Invalid location data' });
   }
 };
 
+const getUserLocation = () => {
+  console.log(`Returning stored location: ${userLocation.latitude}, ${userLocation.longitude}`);
+  return userLocation;
+};
 
-
-
-module.exports = { getNearbyEvents, updateLocation};
+module.exports = { getNearbyEvents, updateLocation, getUserLocation };
