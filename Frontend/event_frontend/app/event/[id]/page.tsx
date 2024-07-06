@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import HomePage from "../../components/home/page";
 import { format } from 'date-fns';
 import Footer from "@/app/components/footer";
+import Link from "next/link";
 
 interface Event {
   id: number;
@@ -25,7 +26,7 @@ const formatDate = (dateString: string) => {
 const Events = () => {
   const [loading, setLoading] = useState(true); // Add a loading state
   const [events, setEvents] = useState<Event[]>([]);
-  const { id } = useParams();
+  const { id }:any = useParams();
   const router = useRouter();
   const [categoryIcon, setCategoryIcon] = useState<string | null>(null);
   const [categoryName, setCategoryName] = useState<string>("");
@@ -69,9 +70,6 @@ const Events = () => {
     return <div>Loading...</div>;
   }
 
-  const handleEventClick = (eventId: number) => {
-    router.push(`/details/${eventId}`);
-  };
 
   const handleClick = (id: number) => {
     router.push(`/details/${id}`);
@@ -102,25 +100,38 @@ const Events = () => {
                     key={event.id}
                     onClick={() => handleClick(event.id)}
                   >
-                    <div className="h-44 md:h-full border-2 border-gray-200 border-opacity-10 rounded-lg overflow-hidden">
-                      <div className="relative">
-                        <img
-                          className="h-44 md:h-40 w-full object-cover object-center"
-                          src={event.event_image}
-                          alt={event.event_name}
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent"></div>
-                      </div>
-                      <div className="absolute bottom-0 w-full text-white p-4 ">
-                        <div>
-                          <h4 className="text-sm font-medium">{event.event_name}</h4>
+                    <Link href={`/details/${event.id}`} passHref>
+                    <div className="p-1 md:p-1 w-full cursor-pointer relative">
+                      <div className="h-44 md:h-full border-2 border-gray-200 border-opacity-10 rounded-lg overflow-hidden">
+                        <div className="relative">
+                          <img
+                            className="h-44 md:h-40 w-full object-cover object-center"
+                            src={event.event_image}
+                            alt={event.event_name}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent"></div>
                         </div>
-                        <div className="flex justify-between">
-                          <div className="text-xs font-medium text-gray-400 mt-1">{formatDate(event.start_date)}</div>
-                          <button type="button" className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-red-300 font-medium rounded-sm text-xs p-1 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">Book Tickets</button>
+                        <div className="absolute bottom-0 w-full text-white p-4 ">
+                          <div>
+                            <h4 className="text-sm font-medium">
+                              {event.event_name}
+                            </h4>
+                          </div>
+                          <div className="flex justify-between">
+                            <div className="text-xs font-medium text-gray-400 mt-1">
+                              {formatDate(event.start_date)}
+                            </div>
+                            <button
+                              type="button"
+                              className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-red-300 font-medium rounded-sm text-xs p-1 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
+                            >
+                              Book Tickets
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
+                  </Link>
                   </div>
                 ))}
               </div>

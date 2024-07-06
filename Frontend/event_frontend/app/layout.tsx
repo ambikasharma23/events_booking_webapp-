@@ -18,7 +18,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <title>React App</title>
+      <title>Event Booking</title>
       <body className={inter.className}>
         <NextTopLoader />
         {children}
