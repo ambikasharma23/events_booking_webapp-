@@ -31,7 +31,7 @@ const Image = () => {
             type="button"
             className="mt-4 text-white bg-gradient-to-r from-purple-500 to-pink-500 hover:bg-gradient-to-l focus:ring-4 focus:outline-none focus:ring-purple-200 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center transition-transform duration-300 ease-in-out transform hover:scale-110"
             style={{ position: "relative", zIndex: 20 }}
-            onClick={() => handleBookNowClick(1)} 
+            onClick={() => handleBookNowClick(9)} 
           >
             Book now
           </button>

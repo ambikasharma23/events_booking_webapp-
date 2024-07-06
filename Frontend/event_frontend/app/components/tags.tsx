@@ -19,6 +19,23 @@ const Tags: React.FC<TagsProps> = ({
   showDropdown,
   handleTagClick, // Destructure handleTagClick
 }) => {
+  const handleUnder10KmClick = () => {
+    // Handle under 10 Km click
+    // Example: Fetch data from http://localhost:3001/restaurants and update events
+    fetch('http://localhost:3001/restaurants')
+      .then(response => response.json())
+      .then(data => {
+        // Process the data as needed
+        console.log('Fetched restaurants:', data);
+        // You may want to update state or call a function to update events based on the fetched data
+        // Example: updateEvents(data);
+      })
+      .catch(error => {
+        console.error('Error fetching restaurants:', error);
+        // Handle errors if needed
+      });
+  };
+
   return (
     <div className="relative">
       {/* Sorting dropdown button */}
@@ -45,12 +62,7 @@ const Tags: React.FC<TagsProps> = ({
               viewBox="0 0 24 24"
               stroke="currentColor"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         )}
@@ -62,13 +74,7 @@ const Tags: React.FC<TagsProps> = ({
             fill="none"
             viewBox="0 0 10 6"
           >
-            <path
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="m1 1 4 4 4-4"
-            />
+            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4" />
           </svg>
         )}
       </button>

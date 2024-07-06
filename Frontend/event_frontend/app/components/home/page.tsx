@@ -116,10 +116,37 @@ export default function HomePage() {
       );
       const data = await response.json();
       setCity(data.city);
+  
+      // Send location to backend
+      sendLocationToBackend(lat, lon);
     } catch (error) {
       console.error("Error fetching city:", error);
     }
   };
+  
+
+  const sendLocationToBackend = async (latitude: number, longitude: number) => {
+  const apiUrl = `http://localhost:3001/updateLocation`;
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ latitude, longitude }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    console.log('Location sent to backend successfully');
+  } catch (error) {
+    console.error('Error sending location to backend:', error);
+  }
+};
+
 
   const clearSearch = () => {
     setQuery("");
