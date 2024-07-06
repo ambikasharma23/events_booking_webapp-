@@ -3,7 +3,8 @@ import React, { useEffect, useState } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { format } from 'date-fns';
+import Link from "next/link";
+import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 
 interface ComedyCat {
@@ -18,16 +19,16 @@ const formatDate = (dateString: string) => {
   return format(date, "do MMMM");
 };
 
-export default function Comedy() {
+export default function Music() {
   const [events, setEvents] = useState<ComedyCat[]>([]);
-  const [loading, setLoading] = useState(true); // Add a loading state
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         let response = await fetch(
-          "http://localhost:3001/allevents?event_category=comedy"
+          "http://localhost:3001/allevents?event_category=comedy&limit=10"
         );
         if (!response.ok) {
           throw new Error("Failed to fetch data");
@@ -38,12 +39,13 @@ export default function Comedy() {
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
-        setLoading(false); // Set loading to false after fetching data
+        setLoading(false);
       }
     };
 
     fetchData();
   }, []);
+
   const settings = {
     dots: true,
     infinite: true,
@@ -84,12 +86,6 @@ export default function Comedy() {
         },
       },
     ],
-  
-  };
-  
-
-  const handleClick = (id: number) => {
-    router.push(`/details/${id}`);
   };
 
   const handleViewAllClick = (category: string) => {
@@ -100,9 +96,12 @@ export default function Comedy() {
     <>
       <div className="flex justify-between items-center p-5">
         <h1 className="text-white font-bold">Comedy Shows</h1>
-        <p className="text-white cursor-pointer" onClick={() => handleViewAllClick('dance')}>
+        <div
+          className="text-white cursor-pointer"
+          onClick={() => handleViewAllClick("music")} // Corrected category name
+        >
           View All
-        </p>
+        </div>
       </div>
 
       <section className="text-gray-100 body-font">
@@ -113,27 +112,39 @@ export default function Comedy() {
                 <div
                   className="p-1 md:p-1 w-full cursor-pointer relative"
                   key={event.id}
-                  onClick={() => handleClick(event.id)}
                 >
-                  <div className="h-44 md:h-full border-2 border-gray-200 border-opacity-10 rounded-lg overflow-hidden">
-                    <div className="relative">
-                      <img
-                        className="h-44 md:h-40 w-full object-cover object-center"
-                        src={event.event_image}
-                        alt={event.event_name}
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent"></div>
-                    </div>
-                    <div className="absolute bottom-0 w-full text-white p-4 ">
-                      <div>
-                        <h4 className="text-sm font-medium">{event.event_name}</h4>
+                  <Link href={`/details/${event.id}`} passHref>
+                    <div className="p-1 md:p-1 w-full cursor-pointer relative">
+                      <div className="h-44 md:h-full border-2 border-gray-200 border-opacity-10 rounded-lg overflow-hidden">
+                        <div className="relative">
+                          <img
+                            className="h-44 md:h-40 w-full object-cover object-center"
+                            src={event.event_image}
+                            alt={event.event_name}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent"></div>
+                        </div>
+                        <div className="absolute bottom-0 w-full text-white p-4 ">
+                          <div>
+                            <h4 className="text-sm font-medium">
+                              {event.event_name}
+                            </h4>
+                          </div>
+                          <div className="flex justify-between">
+                            <div className="text-xs font-medium text-gray-400 mt-1">
+                              {formatDate(event.start_date)}
+                            </div>
+                            <button
+                              type="button"
+                              className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-red-300 font-medium rounded-sm text-xs p-1 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
+                            >
+                              Book Tickets
+                            </button>
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex justify-between">
-                        <div className="text-xs font-medium text-gray-400 mt-1">{formatDate(event.start_date)}</div>
-                        <button type="button" className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-red-300 font-medium rounded-sm text-xs p-1 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">Book Tickets</button>
-                      </div>
                     </div>
-                  </div>
+                  </Link>
                 </div>
               ))}
             </Slider>
