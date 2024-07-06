@@ -269,6 +269,53 @@ const deleteEvent = async (req, res) => {
   }
 };
 
+const getEventsByTags = async (req, res) => {
+  try {
+    const { tags } = req.query;
+    console.log("Received tags:", tags); // Debugging
+
+    // Ensure tags are split correctly into an array
+    const tagsArray = typeof tags === 'string' ? tags.split(',') : [];
+    console.log("Parsed tags array:", tagsArray); // Debugging
+
+    if (tagsArray.length === 0) {
+      return res.status(400).json({ error: "Tags query parameter is required" });
+    }
+
+    const cacheKey = `events_by_tags_${tagsArray.join('_')}`;
+    const cachedData = await redis.get(cacheKey);
+
+    if (cachedData) {
+      const parsedData = JSON.parse(cachedData);
+      return res.status(200).send(parsedData);
+    }
+
+    // Use Op.like to handle tags stored as comma-separated strings
+    const likeConditions = tagsArray.map(tag => ({
+      tags: { [Op.like]: `%${tag.trim()}%` }
+    }));
+
+    const queryOptions = {
+      where: {
+        [Op.and]: likeConditions,
+        end_date: { [Op.gte]: new Date() },
+      },
+    };
+
+    const results = await Event.findAll(queryOptions);
+    console.log("Query results:", results); // Debugging
+
+    await redis.set(cacheKey, JSON.stringify(results), "EX", 3600);
+    return res.status(200).send(results);
+  } catch (error) {
+    console.error("Error fetching events by tags:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+
+
+
 module.exports = {
   getEvents,
   getEventsbyId,
@@ -278,4 +325,5 @@ module.exports = {
   getNightEvents,
   getTodayEvent,
   newEvent,
+  getEventsByTags
 };

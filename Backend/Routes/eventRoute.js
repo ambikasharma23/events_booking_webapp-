@@ -10,6 +10,7 @@ router.get("/allevents/newEvent", eventController.newEvent);
 router.get("/allevents/weeklyEvent", eventController.EventsthisWeak);
 router.get("/allevents/:id", eventController.getEventsbyId);
 router.delete("/delete/:id", eventController.deleteEvent);
+router.get("/events-by-tag", eventController.getEventsByTags);
 
 
 module.exports = router;

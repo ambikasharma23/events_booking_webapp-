@@ -6,6 +6,7 @@ module.exports = {
     await queryInterface.bulkInsert('tickets', [{
       session_id: 1,
       ticket_name: 'Silver',
+      
       cost:900,
       actual_price:1000,
       display_price:950,
