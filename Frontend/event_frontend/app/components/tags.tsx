@@ -8,6 +8,7 @@ interface TagsProps {
   resetSelection: () => void;
   showDropdown: boolean;
   handleTagClick: (tag: string) => void; // Add handleTagClick prop
+  handleUnder10KmClick: () => void;
 }
 
 const Tags: React.FC<TagsProps> = ({
@@ -18,23 +19,10 @@ const Tags: React.FC<TagsProps> = ({
   resetSelection,
   showDropdown,
   handleTagClick, // Destructure handleTagClick
+  handleUnder10KmClick,
+  
 }) => {
-  const handleUnder10KmClick = () => {
-    // Handle under 10 Km click
-    // Example: Fetch data from http://localhost:3001/restaurants and update events
-    fetch('http://localhost:3001/restaurants')
-      .then(response => response.json())
-      .then(data => {
-        // Process the data as needed
-        console.log('Fetched restaurants:', data);
-        // You may want to update state or call a function to update events based on the fetched data
-        // Example: updateEvents(data);
-      })
-      .catch(error => {
-        console.error('Error fetching restaurants:', error);
-        // Handle errors if needed
-      });
-  };
+
 
   return (
     <div className="relative">
@@ -79,8 +67,18 @@ const Tags: React.FC<TagsProps> = ({
         )}
       </button>
 
+        {/* "Under 10 Km" button */}
+      <button
+        className="text-white bg-gray-400 hover:bg-gray-500 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-blue-800 ml-2"
+        onClick={handleUnder10KmClick}
+        type="button"
+      >
+        Under 10 Km
+      </button>
+
+
       {/* Tag buttons */}
-      {['under 10 Km', 'DJ', 'Live music', 'Nightlife & clubbing', 'comedy', 'Party'].map(tag => (
+      {['DJ', 'Live music', 'Nightlife & clubbing', 'comedy', 'Party'].map(tag => (
         <button
           key={tag}
           className="text-white bg-gray-400 hover:bg-gray-500 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-blue-800 ml-2"
