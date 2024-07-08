@@ -117,7 +117,7 @@ const getEvents = async (req, res) => {
 
 
 
-const EventsthisWeak = async (req, res) => {
+const EventsthisWeek = async (req, res) => {
   try {
     const today = new Date();
     const day = today.getDay();
@@ -127,6 +127,7 @@ const EventsthisWeak = async (req, res) => {
     startOfWeek.setHours(0, 0, 0, 0);
     const endOfWeek = new Date(today.setDate(diff + 6));
     endOfWeek.setHours(23, 59, 59, 999);
+
     const cacheKey = "eventsthisweek";
     const cachedData = await redis.get(cacheKey);
 
@@ -136,12 +137,38 @@ const EventsthisWeak = async (req, res) => {
     }
 
     const weeklyEvents = await Event.findAll({
+      include: [{
+        model: Session,
+        as: "session",
+        required: true,
+        include: [{
+          model: Ticket,
+          as: "ticket",
+          required: true,
+          where: {
+            ticket_date: {
+              [Op.between]: [startOfWeek, endOfWeek],
+            },
+          },
+        }],
+      }],
       where: {
-        start_date: {
-          [Op.between]: [new Date(), endOfWeek],
-        },
+        [Op.and]: [
+          {
+            start_date: {
+              [Op.lte]: endOfWeek,
+            },
+          },
+          {
+            [Op.or]: [
+              { end_date: { [Op.gte]: startOfWeek } },
+              { end_date: null }, // Include events that do not have an end date
+            ],
+          },
+        ],
       },
     });
+
     await redis.set(cacheKey, JSON.stringify(weeklyEvents), "EX", 3600);
     return res.status(200).json(weeklyEvents);
   } catch (error) {
@@ -149,7 +176,6 @@ const EventsthisWeak = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
 const getNightEvents = async (req, res) => {
   try {
     const lateTime = "19:00:00";
@@ -321,7 +347,7 @@ module.exports = {
   getEventsbyId,
   deleteEvent,
   createEvent,
-  EventsthisWeak,
+  EventsthisWeek,
   getNightEvents,
   getTodayEvent,
   newEvent,
