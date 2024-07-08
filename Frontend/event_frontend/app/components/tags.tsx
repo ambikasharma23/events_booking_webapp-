@@ -22,7 +22,7 @@ const Tags: React.FC<TagsProps> = ({
   handleUnder10KmClick,
   
 }) => {
-
+ 
 
   return (
     <div className="relative">

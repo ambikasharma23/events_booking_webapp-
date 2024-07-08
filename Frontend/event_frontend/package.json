@@ -21,6 +21,8 @@
     "color-thief-node": "^1.0.4",
     "date-fns": "^3.6.0",
     "embla-carousel-react": "^8.1.5",
+    "google-libphonenumber": "^3.2.35",
+    "libphonenumber-js": "^1.11.4",
     "lucide-react": "^0.395.0",
     "next": "^14.2.4",
     "next-nprogress-bar": "^2.3.12",
@@ -36,6 +38,7 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@types/google-libphonenumber": "^7.4.30",
     "@types/node": "^20.14.4",
     "@types/nprogress": "^0.2.3",
     "@types/react": "^18.3.3",
