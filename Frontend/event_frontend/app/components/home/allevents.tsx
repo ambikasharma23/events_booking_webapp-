@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useEffect, useState } from "react";
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-import { useRouter } from "next/navigation";
-import Tags from "../tags";
+import React, { useEffect, useState } from 'react';
+import Slider from 'react-slick';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
+import { useRouter } from 'next/navigation';
+import Tags from '../tags';
 
 interface AllEvents {
   id: number;
@@ -18,7 +18,7 @@ const CustomPrevArrow = (props: any) => {
   return (
     <div
       className={`${className} custom-prev-arrow`}
-      style={{ ...style, display: "block" }}
+      style={{ ...style, display: 'block' }}
       onClick={onClick}
     />
   );
@@ -29,7 +29,7 @@ const CustomNextArrow = (props: any) => {
   return (
     <div
       className={`${className} custom-next-arrow`}
-      style={{ ...style, display: "block" }}
+      style={{ ...style, display: 'block' }}
       onClick={onClick}
     />
   );
@@ -47,20 +47,21 @@ export default function EventExplorer() {
 
   const fetchData = async (sortOption?: string) => {
     try {
-      let url = "http://localhost:3001/allevents";
+      let url = 'http://localhost:3001/allevents';
+
       if (sortOption) {
         switch (sortOption) {
-          case "Cost: low to high":
-            url = "http://localhost:3001/Eventcost?sort=asc";
+          case 'Cost: low to high':
+            url = 'http://localhost:3001/Eventcost?sort=asc';
             break;
-          case "Cost: high to low":
-            url = "http://localhost:3001/Eventcost?sort=desc";
+          case 'Cost: high to low':
+            url = 'http://localhost:3001/Eventcost?sort=desc';
             break;
-          case "Distance: low to high":
-            url = "http://localhost:3001/Eventdistance?sort=asc";
+          case 'Distance: low to high':
+            url = 'http://localhost:3001/Eventdistance?sort=asc';
             break;
-          case "Date":
-            url = "http://localhost:3001/eventDate";
+          case 'Date':
+            url = 'http://localhost:3001/eventDate';
             break;
           default:
             break;
@@ -68,13 +69,13 @@ export default function EventExplorer() {
       }
       let response = await fetch(url);
       if (!response.ok) {
-        throw new Error("Failed to fetch data");
+        throw new Error('Failed to fetch data');
       }
       const data: AllEvents[] = await response.json();
       console.log(data);
       setEvents(data);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error('Error fetching data:', error);
     }
   };
 
@@ -83,13 +84,28 @@ export default function EventExplorer() {
       const url = `http://localhost:3001/events-by-tag?tags=${encodeURIComponent(tag)}`;
       const response = await fetch(url);
       if (!response.ok) {
-        throw new Error("Failed to fetch events");
+        throw new Error('Failed to fetch events');
       }
       const data: AllEvents[] = await response.json();
       console.log(data);
       setEvents(data);
     } catch (error) {
-      console.error("Error fetching events by tag:", error);
+      console.error('Error fetching events by tag:', error);
+    }
+  };
+
+  const fetchEventsUnder10Km = async () => {
+    try {
+      const url = `http://localhost:3001/under10km`;
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Failed to fetch events under 10 km');
+      }
+      const data: AllEvents[] = await response.json();
+      console.log('Fetched events under 10 km:', data);
+      setEvents(data);
+    } catch (error) {
+      console.error('Error fetching events under 10 km:', error);
     }
   };
 
@@ -164,6 +180,7 @@ export default function EventExplorer() {
           resetSelection={resetSelection}
           showDropdown={showDropdown}
           handleTagClick={fetchEventsByTag} // Pass fetchEventsByTag function
+          handleUnder10KmClick={fetchEventsUnder10Km} // Pass fetchEventsUnder10Km function
         />
       </div>
 
