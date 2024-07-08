@@ -8,7 +8,8 @@ import Footer from "@/app/components/footer";
 import HomePage from "@/app/components/home/page";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendar } from "@fortawesome/free-solid-svg-icons";
-import { PhoneNumberUtil, PhoneNumberFormat } from 'google-libphonenumber';
+import { PhoneNumberUtil, PhoneNumberFormat } from "google-libphonenumber";
+import { format, parse } from "date-fns";
 
 interface Event {
   id: number;
@@ -153,21 +154,21 @@ const EventDetails = () => {
       ...prevBookingInfo,
       [name]: value,
     }));
-  
-    if (name === 'phoneNumber') {
+
+    if (name === "phoneNumber") {
       const isValidPhoneNumber = validatePhoneNumber(value);
       if (!isValidPhoneNumber) {
-        setErrorMessage('Invalid phone number format');
+        setErrorMessage("Invalid phone number format");
       } else {
-        setErrorMessage('');
+        setErrorMessage("");
       }
     }
   };
-  
+
   const validatePhoneNumber = (phoneNumber: string): boolean => {
     try {
       // Assuming 'IN' for India as an example. Replace with appropriate region code.
-      const number = phoneUtil.parse(phoneNumber, 'IN');
+      const number = phoneUtil.parse(phoneNumber, "IN");
       return phoneUtil.isValidNumber(number);
     } catch (error) {
       return false;
@@ -482,16 +483,15 @@ const EventDetails = () => {
                       Phone Number
                     </label>
                     <input
-                        type="tel"
-                        id="phoneNumber"
-                        name="phoneNumber"
-                        value={bookingInfo.phoneNumber}
-                        onChange={handleInputChange}
-                        placeholder="123-456-789"
-                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                         required
-                      />
-
+                      type="tel"
+                      id="phoneNumber"
+                      name="phoneNumber"
+                      value={bookingInfo.phoneNumber}
+                      onChange={handleInputChange}
+                      placeholder="123-456-789"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      required
+                    />
                   </div>
                 </div>
                 {errorMessage && (
