@@ -16,7 +16,7 @@ const ConfirmPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [bookings, setBookings] = useState<BookingDetails[]>([]);
-  const searchParams = useSearchParams();
+  const searchParams = useSearchParams() ;
 
   useEffect(() => {
     const fetchBookings = async () => {

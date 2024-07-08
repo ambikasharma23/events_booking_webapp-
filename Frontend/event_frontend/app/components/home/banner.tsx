@@ -13,7 +13,7 @@ const Image = () => {
 
   return (
     <>
-      <div className="relative w-full bg-cover bg-center" style={{ backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%), url('/images/events-background-1.jpg')`, height: '70vh' }}>
+      <div className="relative w-full bg-cover bg-center" style={{ backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%), url('/images/events.jpg')`, height: '70vh' }}>
         <div className="absolute inset-0"></div>
         
         <div className="fixed top-0 left-0 right-0 z-50">

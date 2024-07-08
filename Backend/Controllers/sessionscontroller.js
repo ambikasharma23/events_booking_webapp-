@@ -47,19 +47,11 @@ const deleteSession = async (req, res) => {
 const getSessionsByEventId = async (req, res) => {
   try {
     const { eventId } = req.params;
-    const cacheKey = "sessions";
-    const cachedData = await redis.get(cacheKey);
-
-    if (cachedData) {
-      const parsedData = JSON.parse(cachedData);
-      return res.status(200).send(parsedData);
-    }
     const sessions = await Session.findAll({
       where: { event_id: eventId },
     });
 
     if (sessions && sessions.length > 0) {
-      await redis.set(cacheKey, JSON.stringify(sessions), "EX", 3600);
       return res.status(200).json(sessions);
     } else {
       throw new Error("Sessions not found for the event");

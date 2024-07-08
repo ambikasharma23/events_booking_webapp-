@@ -58,7 +58,7 @@ const EventDetails = () => {
   const [ticketQuantities, setTicketQuantities] = useState<{
     [key: number]: number;
   }>({});
-  const { id } = useParams();
+  const { id }:any = useParams();
   const router = useRouter();
 
   useEffect(() => {
