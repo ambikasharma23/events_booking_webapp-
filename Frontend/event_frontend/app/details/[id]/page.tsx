@@ -8,6 +8,7 @@ import Footer from "@/app/components/footer";
 import HomePage from "@/app/components/home/page";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendar } from "@fortawesome/free-solid-svg-icons";
+import { format, parse } from "date-fns";
 
 interface Event {
   id: number;
@@ -58,7 +59,7 @@ const EventDetails = () => {
   const [ticketQuantities, setTicketQuantities] = useState<{
     [key: number]: number;
   }>({});
-  const { id }:any = useParams();
+  const { id }: any = useParams();
   const router = useRouter();
 
   useEffect(() => {
@@ -195,7 +196,7 @@ const EventDetails = () => {
         }
 
         const result = await response.json();
-        console.log(`Response for ticket ID ${ticketId}:`, result); 
+        console.log(`Response for ticket ID ${ticketId}:`, result);
         if (!result.booking || !result.booking.id) {
           throw new Error(`booking_id is undefined for ticket ID ${ticketId}`);
         }
@@ -204,7 +205,7 @@ const EventDetails = () => {
       });
 
       const bookingIds = await Promise.all(bookingPromises);
-      console.log("Booking IDs:", bookingIds); 
+      console.log("Booking IDs:", bookingIds);
 
       setBookingInfo({
         name: "",
@@ -213,18 +214,22 @@ const EventDetails = () => {
         numberOfPersons: 0,
       });
       setTicketQuantities({});
-      setErrorMessage(""); 
+      setErrorMessage("");
 
       const queryParams = new URLSearchParams({
         bookingIds: JSON.stringify(bookingIds),
       }).toString();
 
-      console.log("Query Params:", queryParams); 
+      console.log("Query Params:", queryParams);
       router.push(`/confirm?${queryParams}`);
     } catch (error) {
       console.error("Error submitting booking:", error);
       alert("Error submitting booking. Please try again.");
     }
+  };
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return format(date, "do MMMM");
   };
 
   if (!event) {
@@ -338,7 +343,7 @@ const EventDetails = () => {
           </div>
           <div className="w-full lg:w-5/12 pt-8">
             <div className="max-w-sm mx-auto bg-white p-2 rounded">
-              <h1 className="items-center text-xl font-extrabold dark:text-white">
+              <h1 className="text-xl font-extrabold dark:text-white">
                 Sessions
               </h1>
               <ul className="text-sm text-gray-700 dark:text-white">
@@ -358,7 +363,7 @@ const EventDetails = () => {
                     {session.new_description}
                     <div>
                       <button
-                        className="bg-sky-500	 text-white font-bold py-2 px-4 rounded mt-2 mb-2"
+                        className="bg-sky-500 text-white font-bold py-2 px-4 rounded mt-2 mb-2"
                         onClick={() => handleSessionClick(session.id)}
                       >
                         {openSessions.includes(session.id)
@@ -367,7 +372,7 @@ const EventDetails = () => {
                       </button>
                     </div>
                     {openSessions.includes(session.id) && (
-                      <div>
+                      <div className="max-h-64 overflow-y-auto p-2">
                         {ticketsBySession[session.id]?.map((ticket) => (
                           <div key={ticket.id} className="mb-4">
                             <div>
@@ -375,10 +380,8 @@ const EventDetails = () => {
                                 <div className="font-bold text-orange-500">
                                   {ticket.ticket_name}
                                 </div>
-                                <div>
-                                  {new Date(
-                                    ticket.ticket_date
-                                  ).toLocaleDateString()}
+                                <div className="text-yellow-300">
+                                  {formatDate(ticket.ticket_date)}
                                 </div>
                               </div>
                               <div className="flex justify-between">
@@ -387,7 +390,7 @@ const EventDetails = () => {
                                 </div>
                                 <div className="flex items-center space-x-4">
                                   <button
-                                    className="text-xs text-white focus:outline-none bg-green-600 px-1 py-1 "
+                                    className="text-xs text-white focus:outline-none bg-green-600 px-1 py-1"
                                     onClick={() =>
                                       handleQuantityChange(
                                         ticket.id,
@@ -404,7 +407,7 @@ const EventDetails = () => {
                                     {ticketQuantities[ticket.id] || "Add"}
                                   </span>
                                   <button
-                                    className="text-xs text-white focus:outline-none bg-rose-600 px-1 py-1 "
+                                    className="text-xs text-white focus:outline-none bg-rose-600 px-1 py-1"
                                     onClick={() =>
                                       handleQuantityChange(
                                         ticket.id,
@@ -425,6 +428,7 @@ const EventDetails = () => {
                 ))}
               </ul>
             </div>
+
             <div className="max-w-sm mx-auto mt-6 bg-white p-2 rounded">
               <h1 className="items-center text-xl font-extrabold dark:text-white">
                 Enter Details
