@@ -1,3 +1,5 @@
+// controllers/restaurantcontroller.js
+
 const { Op } = require('sequelize');
 const { restaurant, events } = require('../models');
 
@@ -60,6 +62,67 @@ const getNearbyEvents = async (req, res) => {
   }
 };
 
+const getNearbyEventsSortedByDistance = async (req, res) => {
+  const { latitude, longitude } = userLocation;
+  console.log(`Current stored location: ${latitude}, ${longitude}`);
+  if (!latitude || !longitude) {
+    return res.status(400).json({ error: 'User location not available' });
+  }
+
+  const maxDistance = req.query.maxDistance || 10; // Set default to 10 km
+
+  try {
+    const restaurants = await restaurant.findAll({
+      include: {
+        model: events,
+        as: 'events',
+        required: true
+      }
+    });
+
+    // Map through restaurants and calculate distances, keeping only necessary data
+    const nearbyEvents = restaurants
+      .filter(restaurant => {
+        const distance = haversineDistance(latitude, longitude, restaurant.latitude, restaurant.longitude);
+        return distance <= maxDistance;
+      })
+      .map(restaurant => 
+        restaurant.events.map(event => ({
+          id: event.id,
+          restaurant_id: event.restaurant_id,
+          event_name: event.event_name,
+          event_image: event.event_image,
+          city_id: event.city_id,
+          region_id: event.region_id,
+          event_description: event.event_description,
+          recurrent_type: event.recurrent_type,
+          custom_day: event.custom_day,
+          all_day: event.all_day,
+          category_id: event.category_id,
+          start_date: event.start_date,
+          end_date: event.end_date,
+          is_Recurrent: event.is_Recurrent,
+          tags: event.tags,
+          starting_price: event.starting_price,
+          created_by: event.created_by,
+          updated_by: event.updated_by,
+          createdAt: event.createdAt,
+          updatedAt: event.updatedAt,
+          distance: haversineDistance(latitude, longitude, restaurant.latitude, restaurant.longitude)
+        }))
+      )
+      .flat();
+
+    // Sort events by distance (ascending order)
+    nearbyEvents.sort((eventA, eventB) => eventA.distance - eventB.distance);
+
+    res.json(nearbyEvents);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred while fetching events' });
+  }
+};
+
 const updateLocation = (req, res) => {
   const { latitude, longitude } = req.body;
 
@@ -80,4 +143,4 @@ const getUserLocation = () => {
   return userLocation;
 };
 
-module.exports = { getNearbyEvents, updateLocation, getUserLocation };
+module.exports = { getNearbyEvents, updateLocation, getUserLocation, getNearbyEventsSortedByDistance };
