@@ -29,7 +29,6 @@ const getTicket = async (req, res) => {
   }
 };
 
-//Exception applied on tickets on the basis of session_id
 const createTicket = async (req, res) => {
   try {
     const {
@@ -51,7 +50,7 @@ const createTicket = async (req, res) => {
         .json({ error: "Session or associated event not found" });
     }
 
-    const { start_date, end_date, recurrent_type } = session.events;
+    const { start_date, end_date, custom_day } = session.events;
     const eventStart = new Date(start_date);
     const eventEnd = end_date ? new Date(end_date) : null;
 
@@ -59,20 +58,37 @@ const createTicket = async (req, res) => {
       where: { session_id },
       attributes: ["start_date", "end_date"],
     });
-    //When end date is given range of dates need to be stored
+
     const exceptionRanges = exceptions.map((ex) => ({
       ExStart: new Date(ex.start_date),
       ExEnd: ex.end_date ? new Date(ex.end_date) : new Date(ex.start_date),
     }));
 
-    const ticketData = []; //array to store ticket dates with data
+    const ticketData = [];
+
+    const daysOfWeek = {
+      sunday: 0,
+      monday: 1,
+      tuesday: 2,
+      wednesday: 3,
+      thursday: 4,
+      friday: 5,
+      saturday: 6,
+    };
+
+    const customDays = custom_day.toLowerCase().split(',').map(day => day.trim());
 
     let d = new Date(eventStart);
     while (!eventEnd || d <= eventEnd) {
       const isException = exceptionRanges.some(
         (range) => d >= range.ExStart && d <= range.ExEnd
       );
-      if (!isException) {
+      const dayOfWeek = d.getDay();
+      const isCustomDay = customDays.includes(
+        Object.keys(daysOfWeek).find(key => daysOfWeek[key] === dayOfWeek)
+      );
+
+      if (!isException && isCustomDay) {
         ticketData.push({
           session_id,
           ticket_date: new Date(d),
@@ -84,33 +100,14 @@ const createTicket = async (req, res) => {
         });
       } else {
         console.log(
-          `Skipping ticket creation for date: ${d.toISOString()} due to exception`
+          `Skipping ticket creation for date: ${d.toISOString()} due to exception or not matching custom day`
         );
       }
 
-      if (recurrent_type === "daily") {
-        d.setDate(d.getDate() + 1);
-      } else if (recurrent_type === "weekly") {
-        d.setDate(d.getDate() + 7);
-      } else if (recurrent_type === "biweekly") {
-        d.setDate(d.getDate() + 14);
-      } else if (recurrent_type === "monthly") {
-        d.setMonth(d.getMonth() + 1);
-      } else {
-        break;
-      }
+      d.setDate(d.getDate() + 1);
     }
 
-    const ticketPromises = [];
-    for (let i = 0; i < ticketData.length; i++) {
-      try {
-        const ticket = ticketData[i];
-        const createdTicket = await Ticket.create(ticket);
-        ticketPromises.push(createdTicket);
-      } catch (error) {
-        console.error("Error creating ticket:", error);
-      }
-    }
+    const ticketPromises = ticketData.map(ticket => Ticket.create(ticket));
 
     const tickets = await Promise.all(ticketPromises);
     res.status(201).json({ tickets });
@@ -119,6 +116,7 @@ const createTicket = async (req, res) => {
     res.status(500).json({ error: "Error during ticket creation" });
   }
 };
+
 
 // api for updating ticket
 const updateTicket = async (req, res) => {
