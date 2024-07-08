@@ -58,7 +58,7 @@ export default function EventExplorer() {
             url = 'http://localhost:3001/Eventcost?sort=desc';
             break;
           case 'Distance: low to high':
-            url = 'http://localhost:3001/Eventdistance?sort=asc';
+            url = 'http://localhost:3001/events/sortedByDistance';
             break;
           case 'Date':
             url = 'http://localhost:3001/eventDate';
