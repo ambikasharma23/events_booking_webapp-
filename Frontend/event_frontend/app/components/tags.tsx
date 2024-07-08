@@ -32,7 +32,7 @@ const Tags: React.FC<TagsProps> = ({
         data-dropdown-toggle="dropdownHover"
         data-dropdown-trigger="hover"
         onClick={toggleDropdown}
-        className={`text-white ${selectedOption ? 'bg-yellow-500' : 'bg-gray-400 hover:bg-gray-500'} focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-2 text-center inline-flex items-center dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-blue-800`}
+        className={`text-white ${selectedOption ? 'bg-white text-black' : 'bg-sky-500 hover:bg-sky-700'} focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-2 text-center inline-flex items-center dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-blue-800`}
         type="button"
       >
         {selectedOption || 'Sort'}{' '}
@@ -69,7 +69,7 @@ const Tags: React.FC<TagsProps> = ({
 
         {/* "Under 10 Km" button */}
       <button
-        className="text-white bg-gray-400 hover:bg-gray-500 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-blue-800 ml-2"
+        className="text-white bg-sky-500 hover:bg-sky-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-blue-800 ml-2"
         onClick={handleUnder10KmClick}
         type="button"
       >
@@ -81,7 +81,7 @@ const Tags: React.FC<TagsProps> = ({
       {['DJ', 'Live music', 'Nightlife & clubbing', 'comedy', 'Party'].map(tag => (
         <button
           key={tag}
-          className="text-white bg-gray-400 hover:bg-gray-500 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-blue-800 ml-2"
+          className="text-white bg-sky-500 hover:bg-sky-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-blue-800 ml-2"
           onClick={() => handleTagClick(tag)}
           type="button"
         >

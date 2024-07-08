@@ -1,16 +1,19 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import Slider from 'react-slick';
-import 'slick-carousel/slick/slick.css';
-import 'slick-carousel/slick/slick-theme.css';
-import { useRouter } from 'next/navigation';
-import Tags from '../tags';
+import React, { useEffect, useState } from "react";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import { useRouter } from "next/navigation";
+import Tags from "../tags";
+import Link from "next/link";
+import { format, parseISO } from "date-fns";
 
 interface AllEvents {
   id: number;
   event_image: string;
   event_name: string;
+  start_date: string;
 }
 
 const CustomPrevArrow = (props: any) => {
@@ -18,7 +21,7 @@ const CustomPrevArrow = (props: any) => {
   return (
     <div
       className={`${className} custom-prev-arrow`}
-      style={{ ...style, display: 'block' }}
+      style={{ ...style, display: "block" }}
       onClick={onClick}
     />
   );
@@ -29,7 +32,7 @@ const CustomNextArrow = (props: any) => {
   return (
     <div
       className={`${className} custom-next-arrow`}
-      style={{ ...style, display: 'block' }}
+      style={{ ...style, display: "block" }}
       onClick={onClick}
     />
   );
@@ -39,6 +42,7 @@ export default function EventExplorer() {
   const [events, setEvents] = useState<AllEvents[]>([]);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   const toggleDropdown = () => {
@@ -47,65 +51,72 @@ export default function EventExplorer() {
 
   const fetchData = async (sortOption?: string) => {
     try {
-      let url = 'http://localhost:3001/allevents';
+      setLoading(true); // Start loading
+      let url = "http://localhost:3001/allevents";
 
       if (sortOption) {
         switch (sortOption) {
-          case 'Cost: low to high':
-            url = 'http://localhost:3001/Eventcost?sort=asc';
+          case "Cost: low to high":
+            url = "http://localhost:3001/Eventcost?sort=asc";
             break;
-          case 'Cost: high to low':
-            url = 'http://localhost:3001/Eventcost?sort=desc';
+          case "Cost: high to low":
+            url = "http://localhost:3001/Eventcost?sort=desc";
             break;
-          case 'Distance: low to high':
-            url = 'http://localhost:3001/events/sortedByDistance';
+          case "Distance: low to high":
+            url = "http://localhost:3001/events/sortedByDistance";
             break;
-          case 'Date':
-            url = 'http://localhost:3001/eventDate';
+          case "Date":
+            url = "http://localhost:3001/eventDate";
             break;
           default:
             break;
         }
       }
-      let response = await fetch(url);
+
+      const response = await fetch(url);
       if (!response.ok) {
-        throw new Error('Failed to fetch data');
+        throw new Error("Failed to fetch data");
       }
       const data: AllEvents[] = await response.json();
-      console.log(data);
       setEvents(data);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false); // End loading
     }
   };
 
   const fetchEventsByTag = async (tag: string) => {
     try {
+      setLoading(true); // Start loading
       const url = `http://localhost:3001/events-by-tag?tags=${encodeURIComponent(tag)}`;
       const response = await fetch(url);
       if (!response.ok) {
-        throw new Error('Failed to fetch events');
+        throw new Error("Failed to fetch events");
       }
       const data: AllEvents[] = await response.json();
-      console.log(data);
       setEvents(data);
     } catch (error) {
-      console.error('Error fetching events by tag:', error);
+      console.error("Error fetching events by tag:", error);
+    } finally {
+      setLoading(false); // End loading
     }
   };
 
   const fetchEventsUnder10Km = async () => {
     try {
+      setLoading(true); // Start loading
       const url = `http://localhost:3001/under10km`;
       const response = await fetch(url);
       if (!response.ok) {
-        throw new Error('Failed to fetch events under 10 km');
+        throw new Error("Failed to fetch events under 10 km");
       }
       const data: AllEvents[] = await response.json();
-      console.log('Fetched events under 10 km:', data);
       setEvents(data);
     } catch (error) {
-      console.error('Error fetching events under 10 km:', error);
+      console.error("Error fetching events under 10 km:", error);
+    } finally {
+      setLoading(false); // End loading
     }
   };
 
@@ -115,10 +126,9 @@ export default function EventExplorer() {
     fetchData(option);
   };
 
-  // Reset selected option and fetch all events
   const resetSelection = () => {
     setSelectedOption(null);
-    fetchData(); // Fetch all events
+    fetchData();
   };
 
   useEffect(() => {
@@ -161,8 +171,14 @@ export default function EventExplorer() {
     ],
   };
 
-  const handleClick = (id: number) => {
-    router.push(`/details/${id}`);
+  const formatDate = (dateString: string) => {
+    try {
+      const date = parseISO(dateString);
+      return format(date, "do MMMM");
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return "Invalid Date";
+    }
   };
 
   return (
@@ -171,7 +187,7 @@ export default function EventExplorer() {
         <h1 className="text-white font-bold">Explore All Events</h1>
       </div>
 
-      <div className="mb-8">
+      <div className="mb-8 px-10">
         <Tags
           selectedOption={selectedOption}
           setSelectedOption={setSelectedOption}
@@ -179,37 +195,53 @@ export default function EventExplorer() {
           handleOptionClick={handleOptionClick}
           resetSelection={resetSelection}
           showDropdown={showDropdown}
-          handleTagClick={fetchEventsByTag} // Pass fetchEventsByTag function
-          handleUnder10KmClick={fetchEventsUnder10Km} // Pass fetchEventsUnder10Km function
+          handleTagClick={fetchEventsByTag}
+          handleUnder10KmClick={fetchEventsUnder10Km}
         />
       </div>
 
       <section className="text-gray-100 body-font">
         <div className="container mx-auto">
-          <Slider {...settings}>
-            {events.map((event) => (
-              <div
-                className="p-1 md:p-1 w-full cursor-pointer"
-                key={event.id}
-                onClick={() => handleClick(event.id)}
-              >
-                <div className="relative group h-full border-2 border-gray-200 border-opacity-10 rounded-lg overflow-hidden">
-                  <img
-                    className="h-28 md:h-40 w-full object-cover object-center"
-                    src={event.event_image}
-                    alt={event.event_name}
-                  />
-                  <div className="absolute inset-0 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <CustomPrevArrow />
-                    <CustomNextArrow />
-                  </div>
+          {!loading && events.length > 0 ? (
+            <Slider {...settings}>
+              {events.map((event) => (
+                <div className="p-1 md:p-1 w-full cursor-pointer relative" key={event.id}>
+                  <Link href={`/details/${event.id}`} passHref>
+                    <div className="p-1 md:p-1 w-full cursor-pointer relative">
+                      <div className="h-44 md:h-full border-2 border-gray-200 border-opacity-10 rounded-lg overflow-hidden">
+                        <div className="relative">
+                          <img
+                            className="h-44 md:h-40 w-full object-cover object-center"
+                            src={event.event_image}
+                            alt={event.event_name}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent"></div>
+                        </div>
+                        <div className="absolute bottom-0 w-full text-white p-4">
+                          <div>
+                            <h4 className="text-sm font-medium">{event.event_name}</h4>
+                          </div>
+                          <div className="flex justify-between">
+                            <div className="text-xs font-medium text-gray-400 mt-1">
+                              {formatDate(event.start_date)}
+                            </div>
+                            <button
+                              type="button"
+                              className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-red-300 font-medium rounded-sm text-xs p-1 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
+                            >
+                              Book Tickets
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
                 </div>
-                <h4 className="title-font text-sm font-medium text-white text-center">
-                  {event.event_name}
-                </h4>
-              </div>
-            ))}
-          </Slider>
+              ))}
+            </Slider>
+          ) : (
+            <p>Loading events...</p>
+          )}
         </div>
       </section>
     </>
