@@ -10,7 +10,7 @@ const getTicket = async (req, res) => {
   try {
     const sessionId = req.query.session_id;
     const today = new Date();
-    today.setHours(0, 0, 0, 0); 
+    today.setHours(0, 0, 0, 0);
     let results;
 
     if (sessionId) {
@@ -30,14 +30,12 @@ const getTicket = async (req, res) => {
         ],
       });
     }
-    
+
     return res.status(200).json(results);
   } catch (error) {
-    console.error("Error handling request:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
 
 const createTicket = async (req, res) => {
   try {
@@ -86,7 +84,10 @@ const createTicket = async (req, res) => {
       saturday: 6,
     };
 
-    const customDays = custom_day.toLowerCase().split(',').map(day => day.trim());
+    const customDays = custom_day
+      .toLowerCase()
+      .split(",")
+      .map((day) => day.trim());
 
     let d = new Date(eventStart);
     while (!eventEnd || d <= eventEnd) {
@@ -95,7 +96,7 @@ const createTicket = async (req, res) => {
       );
       const dayOfWeek = d.getDay();
       const isCustomDay = customDays.includes(
-        Object.keys(daysOfWeek).find(key => daysOfWeek[key] === dayOfWeek)
+        Object.keys(daysOfWeek).find((key) => daysOfWeek[key] === dayOfWeek)
       );
 
       if (!isException && isCustomDay) {
@@ -108,25 +109,19 @@ const createTicket = async (req, res) => {
           display_price,
           capacity,
         });
-      } else {
-        console.log(
-          `Skipping ticket creation for date: ${d.toISOString()} due to exception or not matching custom day`
-        );
       }
 
       d.setDate(d.getDate() + 1);
     }
 
-    const ticketPromises = ticketData.map(ticket => Ticket.create(ticket));
+    const ticketPromises = ticketData.map((ticket) => Ticket.create(ticket));
 
     const tickets = await Promise.all(ticketPromises);
     res.status(201).json({ tickets });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ error: "Error during ticket creation" });
   }
 };
-
 
 // api for updating ticket
 const updateTicket = async (req, res) => {
@@ -153,7 +148,7 @@ const deleteTicket = async (req, res) => {
       where: { id: id },
     });
     if (deleted) {
-      res.status(204).send();
+      res.status(204).send("Ticket deleted successfully");
     } else {
       throw new Error("Ticket not found");
     }
