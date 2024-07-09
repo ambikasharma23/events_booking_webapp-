@@ -21,7 +21,7 @@ const ConfirmPage = () => {
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const bookingIdsParam = searchParams.get("bookingIds");
+        const bookingIdsParam = searchParams?.get("bookingIds") || null;
         if (!bookingIdsParam) {
           throw new Error("No booking IDs found in query parameters.");
         }
@@ -72,7 +72,7 @@ const ConfirmPage = () => {
             <div key={booking.id} className="mb-4">
               <div>
                 <h2 className="font-bold text-lg text-center">Thank You for Booking with Us!!</h2>
-                <h3 className="text-sm text-center">You booking is confirmed</h3>
+                <h3 className="text-sm text-center">Your booking is confirmed</h3>
                 <p className="text-sm text-center ">Booking Id: {booking.id}</p>
 
                 <h2 className="text-sm font-bold pt-3">Booking Details</h2>
