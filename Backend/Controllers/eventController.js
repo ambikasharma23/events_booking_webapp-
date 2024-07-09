@@ -209,7 +209,7 @@ const getTodayEvent = async (req, res) => {
   try {
     const today = new Date();
     const formattedDate = moment(today).format("YYYY-MM-DD");
-    const cacheKey = "Today Events";
+    const cacheKey = "todayEvents";
     const cachedData = await redis.get(cacheKey);
 
     if (cachedData) {
@@ -234,6 +234,7 @@ const getTodayEvent = async (req, res) => {
         },
       },
     });
+
     await redis.set(cacheKey, JSON.stringify(results), "EX", 3600);
     return res.status(200).json(results);
   } catch (err) {
@@ -241,6 +242,7 @@ const getTodayEvent = async (req, res) => {
     res.status(500).json({ error: "Error while fetching events" });
   }
 };
+
 const getEventsbyId = async (req, res) => {
   let id = req.params.id;
   let event = await Event.findOne({
