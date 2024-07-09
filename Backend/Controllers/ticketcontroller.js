@@ -9,10 +9,18 @@ const ticket_inventory = db.ticket_inventory;
 const getTicket = async (req, res) => {
   try {
     const sessionId = req.query.session_id;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); 
     let results;
+
     if (sessionId) {
       results = await Ticket.findAll({
-        where: { session_id: sessionId },
+        where: {
+          session_id: sessionId,
+          ticket_date: {
+            [Op.gte]: today,
+          },
+        },
         include: [
           {
             model: ticket_inventory,
@@ -22,12 +30,14 @@ const getTicket = async (req, res) => {
         ],
       });
     }
+    
     return res.status(200).json(results);
   } catch (error) {
     console.error("Error handling request:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
 
 const createTicket = async (req, res) => {
   try {
