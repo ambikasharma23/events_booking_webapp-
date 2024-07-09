@@ -1,6 +1,6 @@
 const request = require('supertest');
 const express = require('express');
-const { getEvents, getEventsbyId, deleteEvent, createEvent, EventsthisWeak, getNightEvents, getTodayEvent, newEvent } = require('../Controllers/eventController');
+const { getEvents, getEventsbyId, deleteEvent, createEvent, EventsthisWeek, getNightEvents, getTodayEvent, newEvent } = require('../Controllers/eventController');
 
 jest.mock('../models', () => {
   const SequelizeMock = require('sequelize-mock');
@@ -65,7 +65,7 @@ app.get('/events', getEvents);
 app.get('/events/:id', getEventsbyId);
 app.post('/events', createEvent);
 app.delete('/delete/:id', deleteEvent);
-app.get('/events-this-week', EventsthisWeak);
+app.get('/events-this-week', EventsthisWeek);
 app.get('/night-events', getNightEvents);
 app.get('/today-events', getTodayEvent);
 app.get('/new-events', newEvent);
