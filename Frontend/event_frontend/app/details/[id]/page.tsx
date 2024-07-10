@@ -369,7 +369,8 @@ const EventDetails = () => {
                 Sessions
               </h1>
               <ul className="text-sm text-gray-700 dark:text-white">
-                {sessions.map((session) => (
+              {sessions.length > 0 ? (
+                  sessions.map((session) => (
                   <div
                     key={session.id}
                     className="bg-gray-800 p-4 rounded-md my-2 text-white"
@@ -447,7 +448,10 @@ const EventDetails = () => {
                       </div>
                     )}
                   </div>
-                ))}
+                ))
+              ) : (
+                <div className="text-center font-bold text-rose-500 text-lg mt-4 p-4">Coming Soon</div>
+              )}
               </ul>
             </div>
 
