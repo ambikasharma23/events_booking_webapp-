@@ -12,6 +12,7 @@ interface DanceCat {
   event_image: string;
   event_name: string;
   start_date: string;
+  category_id: number;
 }
 
 const formatDate = (dateString: string) => {
@@ -21,6 +22,8 @@ const formatDate = (dateString: string) => {
 
 export default function Music() {
   const [events, setEvents] = useState<DanceCat[]>([]);
+  const [categoryId, setCategoryId] = useState<number | null>(null);
+
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
@@ -36,6 +39,9 @@ export default function Music() {
         const data: DanceCat[] = await response.json();
         console.log("Fetched data:", data);
         setEvents(data);
+        if (data.length > 0) {
+          setCategoryId(data[0].category_id);
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -88,20 +94,15 @@ export default function Music() {
     ],
   };
 
-  const handleViewAllClick = (category: string) => {
-    router.push(`/category/${category}`);
-  };
-
   return (
     <>
       <div className="flex justify-between items-center p-5">
         <h1 className="text-white font-bold">Dance Shows</h1>
-        <div
-          className="text-white cursor-pointer"
-          onClick={() => handleViewAllClick("music")} // Corrected category name
-        >
-          View All
-        </div>
+        {categoryId && (
+          <Link href={`/event/${categoryId}`}>
+            <div className="text-white cursor-pointer">View All</div>
+          </Link>
+        )}
       </div>
 
       <section className="text-gray-100 body-font">
