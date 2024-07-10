@@ -223,7 +223,7 @@ const EventDetails = () => {
           throw new Error(`booking_id is undefined for ticket ID ${ticketId}`);
         }
 
-        return result.booking_id;
+        return result.booking.id;
       });
 
       const bookingIds = await Promise.all(bookingPromises);
@@ -369,8 +369,7 @@ const EventDetails = () => {
                 Sessions
               </h1>
               <ul className="text-sm text-gray-700 dark:text-white">
-              {sessions.length > 0 ? (
-                  sessions.map((session) => (
+                {sessions.map((session) => (
                   <div
                     key={session.id}
                     className="bg-gray-800 p-4 rounded-md my-2 text-white"
@@ -448,10 +447,7 @@ const EventDetails = () => {
                       </div>
                     )}
                   </div>
-                ))
-              ) : (
-                <div className="text-center font-bold text-rose-500 text-lg mt-4 p-4">Coming Soon</div>
-              )}
+                ))}
               </ul>
             </div>
 
