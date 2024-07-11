@@ -91,8 +91,7 @@ describe('Event exception controller', () => {
 
   it('should delete an event-exception', async () => {
     const res = await request(app)
-      .delete('/event-exceptions/1'); // Assuming event exception ID 1 exists for delete
-
-    expect(res.status).toBe(204); // Assuming deletion returns 204 (No Content)
+      .delete('/event-exceptions/1'); 
+    expect(res.status).toBe(204);
   });
 });
