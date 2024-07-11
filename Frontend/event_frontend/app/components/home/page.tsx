@@ -180,37 +180,40 @@ export default function HomePage() {
                 </div>
               )}
             </div>
-            <form className=" w-26 md:w-96 relative" onSubmit={(e) => e.preventDefault()}>
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search..."
-              className="w-full px-3 py-1 rounded-lg bg-gray-200 text-gray-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-gray-300"
-            />
-            {searchInitiated && (
-              <button
-                type="button"
-                className="absolute right-0 top-0 h-full px-3 py-1 text-gray-500 focus:outline-none"
-                onClick={clearSearch}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
+            <form
+              className=" w-26 md:w-96 relative"
+              onSubmit={(e) => e.preventDefault()}
+            >
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search..."
+                className="w-full px-3 py-1 rounded-lg bg-gray-200 text-gray-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-gray-300"
+              />
+              {searchInitiated && (
+                <button
+                  type="button"
+                  className="absolute right-0 top-0 h-full px-3 py-1 text-gray-500 focus:outline-none"
+                  onClick={clearSearch}
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            )}
-          </form>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              )}
+            </form>
           </div>
           <div className="block md:hidden relative">
             <button
@@ -241,10 +244,10 @@ export default function HomePage() {
                   <Link href="/">Bookings</Link>
                 </div>
                 <div className="text-sm text-gray-800 px-3 py-1 font-bold border-b">
-                  <Link href="/">Login</Link>
+                  <Link href={`/register/login`}>Login</Link>
                 </div>
                 <div className="text-sm text-gray-800 px-3 py-1 font-bold">
-                  <Link href="/">Sign Up</Link>
+                  <Link href={`/register/signin`}>Sign In</Link>
                 </div>
               </div>
             )}
@@ -258,20 +261,18 @@ export default function HomePage() {
               <Link href="/">Bookings</Link>
             </div>
             <div className="text-sm text-white px-3 py-1 ">
-              <Link href="/">Login</Link>
+              <Link href={`/register/login`}>Login</Link>
             </div>
             <div className="text-sm text-white px-3 py-1 ">
-              <Link href="/">Sign Up</Link>
+              <Link href={`/register/signin`}>Sign In</Link>
             </div>
           </div>
-
-          
         </header>
       </div>
 
       {searchInitiated && (
         <main className="absolute top-20 left-1/2 transform -translate-x-1/2 p-4 bg-white md:w-46 w-64 max-h-96 overflow-y-scroll">
-        <h1 className="md:text-2xl text-lg font-bold">Search Results</h1>
+          <h1 className="md:text-2xl text-lg font-bold">Search Results</h1>
           {fetchError && <p className="text-red-500">{fetchError}</p>}
           <ul className="mt-4">
             {results.length > 0 ? (
@@ -291,7 +292,6 @@ export default function HomePage() {
           </ul>
         </main>
       )}
-      
     </div>
   );
 }

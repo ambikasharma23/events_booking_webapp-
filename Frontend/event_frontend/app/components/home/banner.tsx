@@ -3,13 +3,11 @@
 import React from "react";
 import HomePage from "./page";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const Image = () => {
   const router = useRouter();
 
-  const handleBookNowClick = (categoryId: number) => {
-    router.push(`/event/${categoryId}`);
-  };
 
   return (
     <>
@@ -41,13 +39,16 @@ const Image = () => {
                 View Events
               </a>
 
-              <a
-                href=""
-                target="_blank"
-                className="inline-flex items-center justify-center w-full px-5 py-3 mb-2 mr-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg sm:w-auto focus:outline-none hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+              
+              <Link href={`/event/1`}>
+              <div className="inline-flex items-center justify-center w-full px-5 py-3 mb-2 mr-2 text-sm font-medium
+                rounded-lg sm:w-auto focus:outline-none text-white
+                bg-gradient-to-r from-purple-500 to-pink-500 hover:bg-gradient-to-l focus:ring-4 focus:outline-none focus:ring-purple-200 
+                dark:focus:ring-purple-800 transition-transform duration-300 ease-in-out transform hover:scale-110"
               >
                 Book Now
-              </a>
+                </div>
+              </Link>
             </div>
           </div>
 
