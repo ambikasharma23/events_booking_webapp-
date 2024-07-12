@@ -5,7 +5,7 @@ const getCategory = async (req, res) => {
   try {
     const { limit, offset } = req.query;
 
-    if (req.params.id) {
+    if (req.params.id) {z
       const categoryId = req.params.id;
       const category = await Category.findByPk(categoryId);
       if (!category) {

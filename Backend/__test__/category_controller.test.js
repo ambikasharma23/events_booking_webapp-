@@ -54,7 +54,9 @@ describe('Category Controller', () => {
   });
 
   it('should delete a category by ID', async () => {
-    const res = await request(app).delete('/api/category/delete/1');
+    const res = await request(app)
+    .delete('/api/category/delete/1');
+    console.error('Response body:', res.body);
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty('message', 'Category deleted successfully');
   });
