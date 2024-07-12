@@ -9,14 +9,13 @@ interface BookingDetails {
   contact: number;
   ticket_id: number;
   no_of_persons: number;
-  // Add other booking details if necessary
 }
 
 const ConfirmPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [bookings, setBookings] = useState<BookingDetails[]>([]);
-  const searchParams = useSearchParams() ;
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -67,22 +66,39 @@ const ConfirmPage = () => {
             src="https://cdn-icons-png.freepik.com/256/14025/14025690.png"
           />
         </div>
-        <div className="container mx-auto pt-12 flex justify-center bg-white w-2/5">
-          {bookings.map((booking) => (
-            <div key={booking.id} className="mb-4">
-              <div>
-                <h2 className="font-bold text-lg text-center">Thank You for Booking with Us!!</h2>
-                <h3 className="text-sm text-center">Your booking is confirmed</h3>
-                <p className="text-sm text-center ">Booking Id: {booking.id}</p>
 
-                <h2 className="text-sm font-bold pt-3">Booking Details</h2>
-                <div className="text-sm">
-                <p>Name: {booking.name}</p>
-                <p>Contact: {booking.contact}</p>
+        <div className="container mx-auto pt-12 pb-4 justify-center bg-white w-2/5">
+          <h2 className="font-bold text-lg text-center text-rose-500">
+            Thank You for Booking with Us!!
+          </h2>
+          <h3 className="text-sm text-center">Your booking is confirmed</h3>
+          <h2 className="text-sm font-bold p-3 text-center">Booking Details</h2>
 
-
-                </div>
+          {bookings.length > 0 && (
+            <div className="mb-1">
+              <div className="text-sm flex justify-between">
+                <p className="font-bold">Name:</p>
+                <p>{bookings[0].name}</p>
               </div>
+              <div className="text-sm flex justify-between">
+                <p className="font-bold">Contact:</p>
+                <p>{bookings[0].contact}</p>
+              </div>
+            </div>
+          )}
+          <hr></hr>
+
+          {bookings.map((booking) => (
+            <div key={booking.id} className="py-1">
+              <div className="text-sm flex justify-between">
+                <p className="font-bold">Booking Id: </p>
+                <p>{booking.id}</p>
+              </div>
+              <div className="text-sm flex justify-between">
+                <p className="font-bold">No of Persons:</p>
+                <p> {booking.no_of_persons}</p>
+              </div>
+              <hr></hr>
             </div>
           ))}
         </div>

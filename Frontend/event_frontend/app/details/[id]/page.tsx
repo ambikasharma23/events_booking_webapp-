@@ -223,7 +223,7 @@ const EventDetails = () => {
           throw new Error(`booking_id is undefined for ticket ID ${ticketId}`);
         }
 
-        return result.booking_id;
+        return result.booking.id;
       });
 
       const bookingIds = await Promise.all(bookingPromises);

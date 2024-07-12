@@ -26,6 +26,7 @@ export default function HomePage() {
   const [results, setResults] = useState<Result[]>([]);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [searchInitiated, setSearchInitiated] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false); // State to manage hamburger menu visibility
   const router = useRouter();
 
   useEffect(() => {
@@ -116,37 +117,35 @@ export default function HomePage() {
       );
       const data = await response.json();
       setCity(data.city);
-  
+
       // Send location to backend
       sendLocationToBackend(lat, lon);
     } catch (error) {
       console.error("Error fetching city:", error);
     }
   };
-  
 
   const sendLocationToBackend = async (latitude: number, longitude: number) => {
-  const apiUrl = `http://localhost:3001/updateLocation`;
+    const apiUrl = `http://localhost:3001/updateLocation`;
 
-  try {
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ latitude, longitude }),
-    });
+    try {
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ latitude, longitude }),
+      });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      console.log("Location sent to backend successfully");
+    } catch (error) {
+      console.error("Error sending location to backend:", error);
     }
-
-    console.log('Location sent to backend successfully');
-  } catch (error) {
-    console.error('Error sending location to backend:', error);
-  }
-};
-
+  };
 
   const clearSearch = () => {
     setQuery("");
@@ -157,7 +156,7 @@ export default function HomePage() {
   return (
     <div>
       <div className="font-sans fixed w-full top-0" style={{ backgroundColor }}>
-        <header className="flex justify-between items-center p-2 md:px-8">
+        <header className="flex justify-between items-center py-4 md:px-8">
           <div className="flex items-center space-x-8">
             <div className="flex items-center space-x-0">
               <img
@@ -165,10 +164,11 @@ export default function HomePage() {
                 alt="Logo"
                 className="h-12 w-12 mr-2"
               />
-              <div className="text-sm md:text-3xl font-bold text-white">
+              <div className="text-sm md:text-3xl font-bold text-white px-2">
                 <Link href="/">eazyEvents</Link>
               </div>
             </div>
+
             <div className="text-sm text-white">
               {location.latitude !== null && location.longitude !== null ? (
                 <div className="flex items-center bg-transparent border-2 border-white text-white p-1 md:p-2 rounded-lg">
@@ -180,47 +180,99 @@ export default function HomePage() {
                 </div>
               )}
             </div>
-          </div>
-          <form
-            className="w-20 md:w-1/6 flex justify-end relative"
-            onSubmit={(e) => e.preventDefault()}
-          >
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search..."
-              className="w-full px-3 py-1 rounded-lg bg-gray-200 text-gray-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-gray-300"
-            />
-            {searchInitiated && (
-              <button
-                type="button"
-                className="absolute right-0 top-0 h-full px-3 py-1 text-gray-500 focus:outline-none"
-                onClick={clearSearch}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
+            <form
+              className=" w-26 md:w-96 relative"
+              onSubmit={(e) => e.preventDefault()}
+            >
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search..."
+                className="w-full px-3 py-1 rounded-lg bg-gray-200 text-gray-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-gray-300"
+              />
+              {searchInitiated && (
+                <button
+                  type="button"
+                  className="absolute right-0 top-0 h-full px-3 py-1 text-gray-500 focus:outline-none"
+                  onClick={clearSearch}
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              )}
+            </form>
+          </div>
+          <div className="block md:hidden relative">
+            <button
+              className="text-white"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+            </button>
+            {isMenuOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg">
+                <div className="text-sm text-gray-800 px-3 py-1 font-bold border-b">
+                  <Link href="/">Home</Link>
+                </div>
+                <div className="text-sm text-gray-800 px-3 py-1 font-bold border-b">
+                  <Link href="/">Bookings</Link>
+                </div>
+                <div className="text-sm text-gray-800 px-3 py-1 font-bold border-b">
+                  <Link href={`/register/login`}>Login</Link>
+                </div>
+                <div className="text-sm text-gray-800 px-3 py-1 font-bold">
+                  <Link href={`/register/signin`}>Sign In</Link>
+                </div>
+              </div>
             )}
-          </form>
+          </div>
+
+          <div className="hidden md:flex justify-between items-center">
+            <div className="text-sm text-white px-3 py-1">
+              <Link href="/">Home</Link>
+            </div>
+            <div className="text-sm text-white px-3 py-1 ">
+              <Link href="/">Bookings</Link>
+            </div>
+            <div className="text-sm text-white px-3 py-1 ">
+              <Link href={`/register/login`}>Login</Link>
+            </div>
+            <div className="text-sm text-white px-3 py-1 ">
+              <Link href={`/register/signin`}>Sign In</Link>
+            </div>
+          </div>
         </header>
       </div>
 
       {searchInitiated && (
-        <main className="fixed top-20 right-8 p-4 bg-white w-46 max-h-96 overflow-y-scroll">
-          <h1 className="text-2xl font-bold">Search Results</h1>
+        <main className="absolute top-20 left-1/2 transform -translate-x-1/2 p-4 bg-white md:w-46 w-64 max-h-96 overflow-y-scroll">
+          <h1 className="md:text-2xl text-lg font-bold">Search Results</h1>
           {fetchError && <p className="text-red-500">{fetchError}</p>}
           <ul className="mt-4">
             {results.length > 0 ? (
