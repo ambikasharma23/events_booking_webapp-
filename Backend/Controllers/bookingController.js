@@ -18,6 +18,7 @@ const createBooking = async (req, res) => {
   } = req.body;
 
   try {
+    const customer_id= req.user.userId;
     const inventory = await ticket_inventory.findOne({
       where: { ticket_id },
     });
